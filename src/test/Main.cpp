@@ -3,10 +3,10 @@
 int main(int argc, char * args[]) {
 
 	try {
-		TestGame game;
-		game.runMainLoop();
-	} catch (EngineException & e) {
-		std::cout << e.what() << std::endl;
+		TestGame game;							//creates a TestGame instance.
+		game.runMainLoop();						//invokes the main game loop on it.
+	} catch (EngineException & e) {				//catches an exception 'e' using its reference in memory.
+		std::cout << e.what() << std::endl;		//prints the exception to the console.
 		getchar();
 	}
 

@@ -1,6 +1,6 @@
 #include "TestMazeGenerator.h"
 
-Dir::Dir() {}
+Dir::Dir() {} //prototype constructor
 
 Dir::Dir(const Dir & other) : bit(other.bit), dx(other.dx), dy(other.dy),
 opposite(other.opposite) {}

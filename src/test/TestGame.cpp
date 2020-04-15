@@ -112,7 +112,7 @@ void TestGame::render() {
 			gfx->drawLine(line->start, line->end);
 	
 
-	gfx->setDrawColor(SDL_COLOR_RED);
+	gfx->setDrawColor(SDL_COLOR_GREEN);
 	gfx->drawRect(box);
 
 	gfx->setDrawColor(SDL_COLOR_YELLOW);
@@ -122,7 +122,7 @@ void TestGame::render() {
 }
 
 void TestGame::renderUI() {
-	gfx->setDrawColor(SDL_COLOR_AQUA);
+	gfx->setDrawColor(SDL_COLOR_GREEN);
 	std::string scoreStr = std::to_string(score);
 	gfx->drawText(scoreStr, 780 - scoreStr.length() * 50, 25);
 

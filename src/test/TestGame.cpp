@@ -1,6 +1,6 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(false), box(5, 5, 30, 30), light(0, 0, 150, 150) {
+TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(false), box(5, 5, 30, 30), light(0, 0, DEFAULT_WINDOW_HEIGHT, DEFAULT_WINDOW_HEIGHT) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 72);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
@@ -51,22 +51,30 @@ TestGame::~TestGame() {
 }
 
 void TestGame::handleKeyEvents() {
-	int speed = 3;
+	int speed = 3;							//player speed
 
-	if (eventSystem->isPressed(Key::W)) {
+	if (eventSystem->isPressed(Key::W) || 
+		eventSystem->isPressed(Key::UP)) {
 		velocity.y = -speed;
 	}
 
-	if (eventSystem->isPressed(Key::S)) {
+	if (eventSystem->isPressed(Key::S) || 
+		eventSystem->isPressed(Key::DOWN)) {
 		velocity.y = speed;
 	}
 
-	if (eventSystem->isPressed(Key::A)) {
+	if (eventSystem->isPressed(Key::A) || 
+		eventSystem->isPressed(Key::LEFT)) {
 		velocity.x = -speed;
 	}
 
-	if (eventSystem->isPressed(Key::D)) {
+	if (eventSystem->isPressed(Key::D) || 
+		eventSystem->isPressed(Key::RIGHT)) {
 		velocity.x = speed;
+	}
+
+	if (eventSystem->isPressed(Key::R)) {
+		//code to reset and initialize the game.
 	}
 }
 
@@ -97,8 +105,8 @@ void TestGame::update() {
 
 	velocity = Vector2i(0, 0);
 
-	light.x = box.x - 60;
-	light.y = box.y - 60;
+	light.x = box.x - DEFAULT_WINDOW_HEIGHT / 2;
+	light.y = box.y - DEFAULT_WINDOW_HEIGHT / 2;
 
 	if (keys == 0) {
 		gameWon = true;
@@ -111,14 +119,14 @@ void TestGame::render() {
 		if (light.intersects(*line))
 			gfx->drawLine(line->start, line->end);
 	
-
 	gfx->setDrawColor(SDL_COLOR_GREEN);
 	gfx->drawRect(box);
 
 	gfx->setDrawColor(SDL_COLOR_YELLOW);
 	for (auto key : points)
 		if (key->alive && light.contains(key->pos))
-			gfx->drawPoint(key->pos);
+			//gfx->drawPoint(key->pos);
+			gfx->drawCircle(key->pos, 2.5f);
 }
 
 void TestGame::renderUI() {

@@ -17,3 +17,11 @@ Uint32 Timer::getTime() {
 Uint32 Timer::getElapsed() {
 	return SDL_GetTicks() - time;
 }
+
+void Timer::setTime(Uint32 t) {
+	time += t;
+}
+
+void Timer::incrementTime() {
+	time += 10;
+}

@@ -20,6 +20,7 @@ AbstractGame::~AbstractGame() {
 	// before shutting down
 	gfx.reset();
 	eventSystem.reset();
+	timer.reset();
 
 	// kill engine
 	XCube2Engine::quit();

@@ -18,7 +18,7 @@ MazeGenerator::MazeGenerator(const int & x, const int & y) : x(x), y(y) {
 
 	E.bit = 4;
 	E.dx = 1;
-	E.dy = -0;
+	E.dy = 0;
 	E.opposite = &W;
 
 	W.bit = 8;
@@ -34,9 +34,9 @@ MazeGenerator::MazeGenerator(const int & x, const int & y) : x(x), y(y) {
 	for (int i = 0; i < x; ++i) {
 		for (int j = 0; j < y; ++j) {
 			maze[i][j] = 0;
-		}
+		} 
 	}
-}
+}//generates the dimensions for the maze using the x and y parameters passed to it from the caller in TestGame.cpp
 
 MazeGenerator::~MazeGenerator() {
 	for (int i = 0; i < x; ++i)
@@ -50,7 +50,7 @@ void MazeGenerator::generateMaze(int cx, int cy) {
 	for (int i = 0; i < 4; ++i) {
 		int index;
 		do {
-			index = getRandom(0, 3);
+			index = getRandom(0, 3); //0, 1 or 2
 		} 
 		while (index == i);
 
@@ -69,4 +69,4 @@ void MazeGenerator::generateMaze(int cx, int cy) {
 			generateMaze(nx, ny);
 		}
 	}
-}
+}//Fills the maze with TILES which enable different directions of movement

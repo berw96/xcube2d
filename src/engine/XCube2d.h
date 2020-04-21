@@ -11,6 +11,7 @@
 #include "PhysicsEngine.h"
 #include "ResourceManager.h"
 #include "Timer.h"
+#include "AI.h"			//mine
 
 const int _ENGINE_VERSION_MAJOR = 0;
 const int _ENGINE_VERSION_MINOR = 1;

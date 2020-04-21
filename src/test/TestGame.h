@@ -2,7 +2,6 @@
 #define __TEST_GAME_H__
 
 #include "../engine/AbstractGame.h"
-
 #include "TestMazeGenerator.h"
 
 struct GameKey {
@@ -18,13 +17,15 @@ class TestGame : public AbstractGame {
 		Vector2i velocity;
 
 		MazeGenerator * gen;
+		Timer * timer;
 
 		std::vector<std::shared_ptr<Line2i>> lines;
 		std::vector<std::shared_ptr<GameKey>> points;
 
 		/* GAMEPLAY */
-		int score, keys, lives;
-		bool gameWon;
+		int score, keys, lives, random_number;
+		bool gameWon, is_Playing;
+		Uint32 time_limit;
 
 		void handleKeyEvents();
 		void update();

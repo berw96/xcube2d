@@ -18,6 +18,9 @@ class AbstractGame {
 		std::shared_ptr<EventEngine> eventSystem;
 		std::shared_ptr<PhysicsEngine> physics;
 
+		std::shared_ptr<Timer> timer;	//mine; shared pointer to enable TestGame access to Timer members.
+		//std::shared_ptr<AI> ai;			//mine; shared pointer to enable TestGame access to AI members.
+
 		/* Main loop control */
 		bool running;
         bool paused;

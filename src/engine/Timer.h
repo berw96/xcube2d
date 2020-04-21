@@ -20,6 +20,8 @@ class Timer {
 		void reset();
 		Uint32 getTime();
 		Uint32 getElapsed();
+		void setTime(Uint32 t);
+		void incrementTime();
 };
 
 #endif

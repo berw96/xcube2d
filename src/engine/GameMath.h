@@ -31,7 +31,7 @@ struct Vector2i {
 	Vector2i() : Vector2i(0, 0) {}
 	Vector2i(int x, int y) : x(x), y(y) {}
 };
-
+//Utilise Point2s constructor as a means of converting the integer at each part of the maze to a Point which the AI can recognize.
 struct Point2 {
 	int x, y;
 
@@ -68,12 +68,23 @@ struct Rectangle2 {
 		return rect;
 	}
 
-	inline bool contains(const Point2 & p) {
-		return p.x >= x && p.x <= x + w
-			&& p.y >= y && p.y <= y + h;
+	/*returns true if the player is overlapping a point 'p'.
+	pass by reference but made constant to ensure that the
+	original value of that point explicity remains the same.*/
+	inline bool contains(const Point2 &p) {
+		return	p.x >= x		&&
+				p.x <= x + w	&& 
+				p.y >= y		&& 
+				p.y <= y + h;
 	}
 
-	inline bool intersects(const Rectangle2 & other) {
+	/*
+	inline bool contains(const Dir &d) {
+		return true;
+	}
+	*/
+
+	inline bool intersects(const Rectangle2 &other) {
         SDL_Rect rect1 = getSDLRect();
         SDL_Rect rect2 = other.getSDLRect();
 

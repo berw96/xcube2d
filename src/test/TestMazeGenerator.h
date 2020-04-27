@@ -13,7 +13,7 @@ class Dir {
 		Dir();
 		Dir(const Dir &);
 		int bit, dx, dy;
-		Dir * opposite;
+		Dir* opposite;
 };
 
 class MazeGenerator {
@@ -22,10 +22,12 @@ class MazeGenerator {
 
 	public:
 		int x, y;
-		int ** maze;
+		int** maze;
+		//interpret maze coordinate as point
 
 		MazeGenerator(const int &, const int &);
 		~MazeGenerator();
+		Dir getDirections(); //return the valid directions which the MazeGenrator instance contains
 
 		void generateMaze(int, int);
 };

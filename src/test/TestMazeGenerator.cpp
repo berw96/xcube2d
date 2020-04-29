@@ -53,7 +53,7 @@ MazeGenerator::~MazeGenerator() {
 	delete[] maze;
 }
 
-//COULD BE USEFUL FOR A.I. PATHFINDING
+//WOULD BE USEFUL FOR A.I. PATHFINDING
 void MazeGenerator::generateMaze(int cx, int cy) {
 	Dir * dirs = new Dir[4] {N, S, E, W};	//possible directions which a single tile allows.
 
@@ -83,5 +83,5 @@ void MazeGenerator::generateMaze(int cx, int cy) {
 			generateMaze(nx, ny); //recursive call
 		}
 	}
-	//COULD BE USEFUL FOR A.I. PATHFINDING
+	//WOULD BE USEFUL FOR A.I. PATHFINDING
 }//Fills the maze with TILES which enable different directions of movement

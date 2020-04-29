@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 #include "../engine/GameMath.h"
 
@@ -27,7 +28,6 @@ class MazeGenerator {
 
 		MazeGenerator(const int &, const int &);
 		~MazeGenerator();
-		Dir getDirections(); //return the valid directions which the MazeGenrator instance contains
 
 		void generateMaze(int, int);
 };

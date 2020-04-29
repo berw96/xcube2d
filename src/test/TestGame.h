@@ -10,13 +10,7 @@ struct GameKey {
 	bool alive;
 };
 
-/*A struct to define what a tile is based off of the mathematics provided
-by GameMath.h and TestMazeGenerator.h*/
-/*struct Tile {
-	Rectangle2 rect2_tileArea_val;
-};*/
-
-class TestGame : public AbstractGame {
+class TestGame : public AbstractGame { //TestGame is derived from AbstractGame via inheritance
 	private:
 		Rect box;
 		Rect light;
@@ -25,10 +19,10 @@ class TestGame : public AbstractGame {
 
 		MazeGenerator* gen;
 		Timer* timer_idleCountdown_adr;
-		AI* ai_artificialIntelligence_adr;
 
 		std::vector<std::shared_ptr<Line2i>> lines;
 		std::vector<std::shared_ptr<GameKey>> points;
+		
 
 		/* GAMEPLAY */
 		int score, keys, lives;

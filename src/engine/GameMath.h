@@ -68,21 +68,19 @@ struct Rectangle2 {
 		return rect;
 	}
 
-	/*returns true if the player is overlapping a point 'p'.
-	pass by reference but made constant to ensure that the
-	original value of that point explicity remains the same.*/
-	inline bool contains(const Point2 &p) {
-		return	p.x >= x		&&
-				p.x <= x + w	&& 
-				p.y >= y		&& 
-				p.y <= y + h;
-	}
-
 	/*
-	inline bool contains(const Dir &d) {
-		return true;
-	}
+	Returns true if the player is overlapping a point 'p'.
+	Pass by reference but made constant to ensure that the
+	original value of that point explicity remains the same.
+	10s added as buffer to bypass deadzone caused by proximity
+	between player box and tile point ((also affects key pickup))
 	*/
+	inline bool contains(const Point2 &p) {
+		return	p.x >= x -		10		&&	//>= origin x
+				p.x <= x + w +	10		&&	//<= total width
+				p.y >= y -		10		&&	//>= origin y
+				p.y <= y + h +	10;			//<= total height
+	}
 
 	inline bool intersects(const Rectangle2 &other) {
         SDL_Rect rect1 = getSDLRect();

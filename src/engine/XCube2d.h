@@ -11,7 +11,7 @@
 #include "PhysicsEngine.h"
 #include "ResourceManager.h"
 #include "Timer.h"
-#include "AI.h"			//mine
+#include "AI.h"			//1780 2815
 
 const int _ENGINE_VERSION_MAJOR = 0;
 const int _ENGINE_VERSION_MINOR = 1;
@@ -23,6 +23,7 @@ class XCube2Engine {
 		std::shared_ptr<AudioEngine> audioInstance;
 		std::shared_ptr<EventEngine> eventInstance;
 		std::shared_ptr<PhysicsEngine> physicsInstance;
+		std::shared_ptr<AI> aiInstance;
 
 		XCube2Engine();
 	public:
@@ -48,6 +49,7 @@ class XCube2Engine {
 		std::shared_ptr<AudioEngine> getAudioEngine() { return audioInstance; }
 		std::shared_ptr<EventEngine> getEventEngine() { return eventInstance; }
 		std::shared_ptr<PhysicsEngine> getPhysicsEngine() { return physicsInstance; }
+		std::shared_ptr<AI> sptrai_getAIEngine_adr() { return aiInstance; }
 };
 
 typedef XCube2Engine XEngine;

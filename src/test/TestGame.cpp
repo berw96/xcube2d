@@ -1,6 +1,6 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(false), box(5, 5, 30, 30), light(0, 0, 150, 150) {
+TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(false), box(5, 5, 30, 30), light(0, 0, 300, 300) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 72);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);

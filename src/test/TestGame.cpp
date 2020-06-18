@@ -1,14 +1,14 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(false), box(5, 5, 30, 30), light(0, 0, 200, 200) {
-	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 72);
+TestGame::TestGame() : AbstractGame(), box(185, 185, 30, 30), light(0, 0, 800, 800) {
+	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 15);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
-
-	gen = new MazeGenerator(10, 10);
+	
+	/*Generates a 1x1 maze with a 400x400 perimeter*/
+	gen = new MazeGenerator(1, 1);
 	gen->generateMaze(0, 0);
-
-	int dist = 40;
+	int dist = 400;
 
 	for (int i = 0; i < gen->y; ++i) {
 
@@ -25,14 +25,6 @@ TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(fals
 			if ((gen->maze[j][i] & 8) == 0) {
 				lines.push_back(std::make_shared<Line2i>(Point2(x, y), Point2(x, y+dist)));
 			}
-
-			if (keys > 0 && getRandom(0, 100) <= 5) {
-				std::shared_ptr<GameKey> k = std::make_shared<GameKey>();
-				k->alive = true;
-				k->pos = Point2(j*dist + dist/2, i*dist + dist/2);
-				points.push_back(k);
-				keys--;
-			}
 		}
 
 		lines.push_back(std::make_shared<Line2i>(Point2(gen->x*dist, y), Point2(gen->x*dist, y + dist)));
@@ -42,8 +34,6 @@ TestGame::TestGame() : AbstractGame(), score(0), lives(3), keys(5), gameWon(fals
 		int x = j * dist;
 		lines.push_back(std::make_shared<Line2i>(Point2(x, gen->y * dist), Point2(x + dist, gen->y * dist)));
 	}
-
-	keys = 5;
 }
 
 TestGame::~TestGame() {
@@ -51,22 +41,32 @@ TestGame::~TestGame() {
 }
 
 void TestGame::handleKeyEvents() {
+
 	int speed = 3;
 
-	if (eventSystem->isPressed(Key::W)) {
+	if (eventSystem->isPressed(Key::UP)) {
 		velocity.y = -speed;
 	}
 
-	if (eventSystem->isPressed(Key::S)) {
+	if (eventSystem->isPressed(Key::DOWN)) {
 		velocity.y = speed;
 	}
 
-	if (eventSystem->isPressed(Key::A)) {
+	if (eventSystem->isPressed(Key::LEFT)) {
 		velocity.x = -speed;
 	}
 
-	if (eventSystem->isPressed(Key::D)) {
+	if (eventSystem->isPressed(Key::RIGHT)) {
 		velocity.x = speed;
+	}
+
+	if (eventSystem->isPressed(Key::R)) {
+		box.x = 185;
+		box.y = 185;
+	}
+
+	if (eventSystem->isPressed(Key::G)) {
+		std::cout << "Gravity toggled" << std::endl;
 	}
 }
 
@@ -87,22 +87,7 @@ void TestGame::update() {
 		}
 	}
 
-	for (auto key : points) {
-		if (key->alive && box.contains(key->pos)) {
-			score += 200;
-			key->alive = false;
-			keys--;
-		}
-	}
-
 	velocity = Vector2i(0, 0);
-
-	light.x = box.x - 60;
-	light.y = box.y - 60;
-
-	if (keys == 0) {
-		gameWon = true;
-	}
 }
 
 void TestGame::render() {
@@ -114,18 +99,21 @@ void TestGame::render() {
 
 	gfx->setDrawColor(SDL_COLOR_RED);
 	gfx->drawRect(box);
-
-	gfx->setDrawColor(SDL_COLOR_YELLOW);
-	for (auto key : points)
-		if (key->alive && light.contains(key->pos))
-			gfx->drawPoint(key->pos);
 }
 
+/*
+	Renders in-game text for the User Interface.
+*/
 void TestGame::renderUI() {
-	gfx->setDrawColor(SDL_COLOR_AQUA);
-	std::string scoreStr = std::to_string(score);
-	gfx->drawText(scoreStr, 780 - scoreStr.length() * 50, 25);
+	gfx->setDrawColor(SDL_COLOR_WHITE);
 
-	if (gameWon)
-		gfx->drawText("YOU WON", 250, 500);
+	std::string x_str = std::to_string(box.x - 185);
+	std::string y_str = std::to_string(box.y - 185);
+	std::string gravityToggle_str;
+
+	gfx->drawText("Gravity:", 500, 30);
+	gfx->drawText("X:", 500, 60);		
+	gfx->drawText(x_str, 530, 60);		
+	gfx->drawText("Y:", 500, 90);		
+	gfx->drawText(y_str, 530, 90);		
 }

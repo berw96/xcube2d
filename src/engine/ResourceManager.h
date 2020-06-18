@@ -9,6 +9,7 @@
 
 class ResourceManager {
 	private:
+		/*CACHING RESOURCES*/
 		static std::map<std::string, SDL_Texture *> textures;
 		static std::map<std::string, Mix_Chunk *> sounds;
 		static std::map<std::string, Mix_Music *> mp3files;
@@ -40,3 +41,4 @@ class ResourceManager {
 };
 
 #endif
+

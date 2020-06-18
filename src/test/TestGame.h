@@ -5,11 +5,6 @@
 
 #include "TestMazeGenerator.h"
 
-struct GameKey {
-	Point2 pos;
-	bool alive;
-};
-
 class TestGame : public AbstractGame {
 	private:
 		Rect box;
@@ -18,13 +13,9 @@ class TestGame : public AbstractGame {
 		Vector2i velocity;
 
 		MazeGenerator * gen;
+		PhysicsObject* player;
 
 		std::vector<std::shared_ptr<Line2i>> lines;
-		std::vector<std::shared_ptr<GameKey>> points;
-
-		/* GAMEPLAY */
-		int score, keys, lives;
-		bool gameWon;
 
 		void handleKeyEvents();
 		void update();

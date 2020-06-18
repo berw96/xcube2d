@@ -37,6 +37,7 @@ class PhysicsObject {
 		float lX, lY, hlX, hlY;	// lengths and half lengths
 
 		Vector2f force;
+		float mass;
 
 		void applyForce(const Vector2f &);
 	public:

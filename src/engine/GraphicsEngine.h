@@ -14,7 +14,7 @@
 
 /* ENGINE DEFAULT SETTINGS */
 static const int DEFAULT_WINDOW_WIDTH = 800;
-static const int DEFAULT_WINDOW_HEIGHT = 600;
+static const int DEFAULT_WINDOW_HEIGHT = 800;
 
 static const SDL_Color SDL_COLOR_GRAY	= { 0x80, 0x80, 0x80 };
 static const SDL_Color SDL_COLOR_YELLOW = { 0xFF, 0xFF, 0 };

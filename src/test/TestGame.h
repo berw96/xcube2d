@@ -8,8 +8,8 @@
 class TestGame : public AbstractGame {
 	private:
 		Rect box;
-		Rect light;
 
+		int speed;
 		Vector2i velocity;
 
 		MazeGenerator * gen;

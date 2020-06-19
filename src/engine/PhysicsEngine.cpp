@@ -1,6 +1,6 @@
 #include "PhysicsEngine.h"
 
-PhysicsObject::PhysicsObject(const Point2 & center, float x, float y) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.0f, 0.0f), mass(1.0f) {}
+PhysicsObject::PhysicsObject(const Point2 & center, float x, float y) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.0f, 0.0f), mass(1.0f), acceleration(0.0f) {}
 
 bool PhysicsObject::isColliding(const PhysicsObject & other) {
     Rectf r1 = { center.x - hlX, center.y - hlY, lX, lY };
@@ -35,4 +35,13 @@ void PhysicsEngine::registerObject(std::shared_ptr<PhysicsObject> obj) {
 
 void PhysicsEngine::update() {
 
+}
+
+void PhysicsEngine::setMass(std::shared_ptr<PhysicsObject> p, float& m) {
+	p->mass = m;
+}
+
+float PhysicsEngine::calculateAcceleration(std::shared_ptr<PhysicsObject> p, float& F, float& m) {
+	p->acceleration = F / m;
+	return p->acceleration;
 }

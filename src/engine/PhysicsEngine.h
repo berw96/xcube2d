@@ -28,6 +28,9 @@ class PhysicsEngine {
 		void update();
 
 		void registerObject(std::shared_ptr<PhysicsObject>);
+
+		void setMass(std::shared_ptr<PhysicsObject> p, float& m);
+		float calculateAcceleration(std::shared_ptr<PhysicsObject> p, float& F, float& m);
 };
 
 class PhysicsObject {
@@ -38,6 +41,7 @@ class PhysicsObject {
 
 		Vector2f force;
 		float mass;
+		float acceleration;
 
 		void applyForce(const Vector2f &);
 	public:

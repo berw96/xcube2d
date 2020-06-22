@@ -1,6 +1,6 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), box(185, 185, 30, 30), speed(1) {
+TestGame::TestGame() : AbstractGame(), box(185, 185, 30, 30), gravityToggled(false), speed_x(0.f), speed_y(0.f) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 15);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
@@ -21,15 +21,15 @@ TestGame::TestGame() : AbstractGame(), box(185, 185, 30, 30), speed(1) {
 			int x = j * dist;
 
 			if ((gen->maze[j][i] & 1) == 0) {
-				lines.push_back(std::make_shared<Line2i>(Point2(x, y), Point2(x+dist, y)));
+				lines.push_back(std::make_shared<Line2i>(Point2(x, y), Point2(x + dist, y)));
 			}
 
 			if ((gen->maze[j][i] & 8) == 0) {
-				lines.push_back(std::make_shared<Line2i>(Point2(x, y), Point2(x, y+dist)));
+				lines.push_back(std::make_shared<Line2i>(Point2(x, y), Point2(x, y + dist)));
 			}
 		}
 
-		lines.push_back(std::make_shared<Line2i>(Point2(gen->x*dist, y), Point2(gen->x*dist, y + dist)));
+		lines.push_back(std::make_shared<Line2i>(Point2(gen->x * dist, y), Point2(gen->x * dist, y + dist)));
 	}
 
 	for (int j = 0; j < gen->x; j++) {
@@ -43,33 +43,47 @@ TestGame::~TestGame() {
 }
 
 void TestGame::handleKeyEvents() {
+	velocity.y = speed_y;
+	velocity.x = speed_x;
 
 	if (eventSystem->isPressed(Key::UP)) {
-		velocity.y = -speed;
+		speed_y -= 0.2f;
 	}
 
-	if (eventSystem->isPressed(Key::DOWN)) {
-		velocity.y = speed;
+	if (eventSystem->isPressed(Key::DOWN) ||
+		gravityToggled == true) {
+		speed_y += 0.2f;
 	}
 
 	if (eventSystem->isPressed(Key::LEFT)) {
-		velocity.x = -speed;
+		speed_x -= 0.2f;
 	}
 
 	if (eventSystem->isPressed(Key::RIGHT)) {
-		velocity.x = speed;
+		speed_x += 0.2f;
 	}
 
 	/*Resets the player transform and velocity*/
 	if (eventSystem->isPressed(Key::R)) {
 		box.x = 185;
 		box.y = 185;
+		speed_x = 0.f;
+		speed_y = 0.f;
 		velocity = Vector2i(0,0);
 	}
 
-	/*Toggles gravity (ON/OFF)*/
+	/*Toggles gravity (ON)*/
 	if (eventSystem->isPressed(Key::G)) {
-		std::cout << "Gravity toggled" << std::endl;
+		if (gravityToggled != true) {
+			gravityToggled = true;
+		}
+	}
+	
+	/*Toggles gravity (OFF)*/
+	if (eventSystem->isPressed(Key::T)) {
+		if (gravityToggled != false) {
+			gravityToggled = false;
+		}
 	}
 }
 
@@ -78,6 +92,7 @@ void TestGame::update() {
 	box.x += velocity.x;
 	for (auto line : lines) {
 		if (box.intersects(*line)) {
+			speed_x = 0.f;
 			box.x -= velocity.x;
 			break;
 		}
@@ -86,6 +101,7 @@ void TestGame::update() {
 	box.y += velocity.y;
 	for (auto line : lines) {
 		if (box.intersects(*line)) {
+			speed_y = 0.f;
 			box.y -= velocity.y;
 			break;
 		}
@@ -110,14 +126,25 @@ void TestGame::renderUI() {
 
 	std::string x_str = std::to_string(box.x - 185);
 	std::string y_str = std::to_string(box.y - 185);
-	std::string speed_str = std::to_string(speed);
+	std::string speedX_str = std::to_string(speed_x);
+	std::string speedY_str = std::to_string(speed_y);
 	std::string gravityToggle_str;
 
+	if (gravityToggled == true) {
+		gravityToggle_str = "ON";
+	}
+	if (gravityToggled == false) {
+		gravityToggle_str = "OFF";
+	}
+
 	gfx->drawText("Gravity:", 500, 30);
-	gfx->drawText("X:", 500, 60);		
-	gfx->drawText(x_str, 530, 60);		
-	gfx->drawText("Y:", 500, 90);		
+	gfx->drawText(gravityToggle_str, 560, 30);
+	gfx->drawText("X:", 500, 60);	
+	gfx->drawText(x_str, 530, 60);	
+	gfx->drawText("Y:", 500, 90);	
 	gfx->drawText(y_str, 530, 90);
-	gfx->drawText("Speed:", 500, 120);
-	gfx->drawText(speed_str, 560, 120);
+	gfx->drawText("SpeedX:", 500, 120);
+	gfx->drawText(speedX_str, 560, 120);
+	gfx->drawText("SpeedY:", 500, 150);
+	gfx->drawText(speedY_str, 560, 150);
 }

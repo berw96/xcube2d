@@ -9,7 +9,9 @@ class TestGame : public AbstractGame {
 	private:
 		Rect box;
 
-		int speed;
+		bool gravityToggled;
+		float speed_x;
+		float speed_y;
 		Vector2i velocity;
 
 		MazeGenerator * gen;

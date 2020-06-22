@@ -42,6 +42,7 @@ void EventEngine::updateKeys(const SDL_Keycode &key, bool keyDown) {
 		case SDLK_SPACE:	index = Key::SPACE; break;
 		case SDLK_r:		index = Key::R; break;
 		case SDLK_g:		index = Key::G; break;
+		case SDLK_t:		index = Key::T; break;
 		default:
 			return;	// we don't care about other keys, at least now
 	}

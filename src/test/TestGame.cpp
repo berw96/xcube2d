@@ -1,11 +1,10 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), box(185, 185, 30, 30), gravityToggled(false), speed_x(0.f), speed_y(0.f) {
+TestGame::TestGame() : AbstractGame(), box(185.f, 185.f, 30.f, 30.f), gravityToggled(false), speed_x(0.f), speed_y(0.f) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 15);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
 
-	
 	/*Generates a 1x1 maze with a 400x400 perimeter*/
 	gen = new MazeGenerator(1, 1);
 	gen->generateMaze(0, 0);
@@ -46,30 +45,32 @@ void TestGame::handleKeyEvents() {
 	velocity.y = speed_y;
 	velocity.x = speed_x;
 
-	if (eventSystem->isPressed(Key::UP)) {
-		speed_y -= 0.2f;
+	if (eventSystem->isPressed(Key::UP) &&
+		gravityToggled != true) {
+		speed_y -= 0.1f;
 	}
 
 	if (eventSystem->isPressed(Key::DOWN) ||
 		gravityToggled == true) {
-		speed_y += 0.2f;
+		speed_y += 0.1f;
 	}
 
 	if (eventSystem->isPressed(Key::LEFT)) {
-		speed_x -= 0.2f;
+		speed_x -= 0.1f;
 	}
 
 	if (eventSystem->isPressed(Key::RIGHT)) {
-		speed_x += 0.2f;
+		speed_x += 0.1f;
 	}
 
 	/*Resets the player transform and velocity*/
 	if (eventSystem->isPressed(Key::R)) {
-		box.x = 185;
-		box.y = 185;
+		box.x = 185.f;
+		box.y = 185.f;
+		gravityToggled = false;
 		speed_x = 0.f;
 		speed_y = 0.f;
-		velocity = Vector2i(0,0);
+		velocity = Vector2f(0.f,0.f);
 	}
 
 	/*Toggles gravity (ON)*/
@@ -106,6 +107,10 @@ void TestGame::update() {
 			break;
 		}
 	}
+
+	/*Calculates the resultant velocity of the player box
+	using Pythagorean theorem.*/
+	speed_res = (sqrtf(pow(speed_x, 2) + pow(speed_y, 2)));
 }
 
 void TestGame::render() {
@@ -114,7 +119,7 @@ void TestGame::render() {
 			gfx->drawLine(line->start, line->end);
 	
 
-	gfx->setDrawColor(SDL_COLOR_RED);
+	gfx->setDrawColor(SDL_COLOR_AQUA);
 	gfx->drawRect(box);
 }
 
@@ -122,29 +127,36 @@ void TestGame::render() {
 	Renders in-game text for the User Interface.
 */
 void TestGame::renderUI() {
-	gfx->setDrawColor(SDL_COLOR_WHITE);
 
-	std::string x_str = std::to_string(box.x - 185);
-	std::string y_str = std::to_string(box.y - 185);
+	/*WHITE TEXT*/
+	gfx->setDrawColor(SDL_COLOR_WHITE);
+	std::string x_str = std::to_string(box.x - 185.f);
+	std::string y_str = std::to_string(box.y - 185.f);
 	std::string speedX_str = std::to_string(speed_x);
 	std::string speedY_str = std::to_string(speed_y);
+	std::string speedRes_str = std::to_string(speed_res);
 	std::string gravityToggle_str;
 
 	if (gravityToggled == true) {
 		gravityToggle_str = "ON";
 	}
-	if (gravityToggled == false) {
+	if (gravityToggled != true) {
 		gravityToggle_str = "OFF";
 	}
 
 	gfx->drawText("Gravity:", 500, 30);
 	gfx->drawText(gravityToggle_str, 560, 30);
+
+	gfx->drawText("V:", 500, 120);
+	gfx->drawText(speedRes_str, 530, 120);
+
+	/*RED TEXT*/
+	gfx->setDrawColor(SDL_COLOR_RED);
 	gfx->drawText("X:", 500, 60);	
-	gfx->drawText(x_str, 530, 60);	
+	gfx->drawText(x_str, 530, 60);
+
+	/*GREEN TEXT*/
+	gfx->setDrawColor(SDL_COLOR_GREEN);
 	gfx->drawText("Y:", 500, 90);	
 	gfx->drawText(y_str, 530, 90);
-	gfx->drawText("SpeedX:", 500, 120);
-	gfx->drawText(speedX_str, 560, 120);
-	gfx->drawText("SpeedY:", 500, 150);
-	gfx->drawText(speedY_str, 560, 150);
 }

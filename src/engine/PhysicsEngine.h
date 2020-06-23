@@ -42,6 +42,7 @@ class PhysicsObject {
 		Vector2f force;
 		float mass;
 		float acceleration;
+		float friction;
 
 		void applyForce(const Vector2f &);
 	public:

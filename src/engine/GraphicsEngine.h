@@ -79,6 +79,7 @@ class GraphicsEngine {
 		void showScreen();
 
 		void drawRect(const Rectangle2 &);
+		void drawRect(const Rectangle2f &);
 		void drawRect(const Rectangle2 &, const SDL_Color &);
 
 		void drawRect(SDL_Rect *, const SDL_Color &);

@@ -7,12 +7,13 @@
 
 class TestGame : public AbstractGame {
 	private:
-		Rect box;
+		Rectf box;
 
 		bool gravityToggled;
 		float speed_x;
 		float speed_y;
-		Vector2i velocity;
+		float speed_res;
+		Vector2f velocity;
 
 		MazeGenerator * gen;
 		PhysicsObject* player;

@@ -29,8 +29,9 @@ class PhysicsEngine {
 
 		void registerObject(std::shared_ptr<PhysicsObject>);
 
-		void setMass(std::shared_ptr<PhysicsObject> p, float& m);
-		float calculateAcceleration(std::shared_ptr<PhysicsObject> p, float& F, float& m);
+		float calculateAcceleration_x(Vector2f& F, float& m);
+		float calculateAcceleration_y(Vector2f& F, float& m);
+		float calculateResultant(Vector2f& v);
 };
 
 class PhysicsObject {
@@ -39,10 +40,12 @@ class PhysicsObject {
 		Point2 center;
 		float lX, lY, hlX, hlY;	// lengths and half lengths
 
+		/*Variables which affect how a physics object reacts to player input*/
 		Vector2f force;
+		Vector2f acceleration;
+		Vector2f velocity;
+		Vector2f speed;
 		float mass;
-		float acceleration;
-		float friction;
 
 		void applyForce(const Vector2f &);
 	public:

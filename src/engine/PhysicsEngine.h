@@ -15,6 +15,7 @@ class PhysicsEngine {
 	friend class PhysicsObject;
 	private:
 		Vector2f gravity;
+		bool gravityToggle;
 		PhysicsEngine();
 
 		std::vector<std::shared_ptr<PhysicsObject>> objects;
@@ -56,6 +57,7 @@ class PhysicsObject {
 		PhysicsObject(const Point2 & center, float x, float y);
 		PhysicsObject(const Point2 & center, float x, float y, float mass);
 		PhysicsObject(const Point2 & center, float x, float y, float mass, Vector2f transform);
+		PhysicsObject(const Point2 & center, float x, float y, Vector2f force, float mass, Vector2f transform);
 
 		Point2 getCenter()						{ return center; }
 		Rectf getCollider()						{ return collider; }
@@ -74,8 +76,8 @@ class PhysicsObject {
 		void setColliderTransform_X(Vector2f t) { collider.x = t.x; }
 		void setColliderTransform_Y(Vector2f t) { collider.y = t.y; }
 		void setRootTransform(Vector2f t)		{ transform = t; }
-		void setRootTransform_X(Vector2f t)		{ transform.x += t.x; }
-		void setRootTransform_Y(Vector2f t)		{ transform.y += t.y; }
+		void setRootTransform_X(float t)		{ transform.x += t; }
+		void setRootTransform_Y(float t)		{ transform.y += t; }
 		void setForce_X(Vector2f f)				{ force.x = f.x; }
 		void setForce_Y(Vector2f f)				{ force.y = f.y; }
 		void setAcceleration_X(float a)			{ acceleration.x = a; }

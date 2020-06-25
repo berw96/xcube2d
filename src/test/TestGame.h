@@ -10,8 +10,6 @@ class TestGame : public AbstractGame {
 
 		bool gravityToggled;
 		float speed_res;
-		Vector2f force;
-		
 
 		MazeGenerator * gen;
 		PhysicsObject* player;

@@ -1,6 +1,6 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), gravityToggled(false), force(0.01f ,0.01f) {
+TestGame::TestGame() : AbstractGame(), gravityToggled(false) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 15);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
@@ -53,8 +53,8 @@ void TestGame::handleKeyEvents() {
 
 	/*Physics engine calculates the appropriate acceleration
 	for the player.*/
-	player->setAcceleration_X(physics->calculateAcceleration_x(force, player->getMass()));
-	player->setAcceleration_Y(physics->calculateAcceleration_y(force, player->getMass()));
+	player->setAcceleration_X(physics->calculateAcceleration_x(player->getForce(), player->getMass()));
+	player->setAcceleration_Y(physics->calculateAcceleration_y(player->getForce(), player->getMass()));
 
 	//acceleraton sets the speed
 	if (eventSystem->isPressed(Key::UP) &&
@@ -103,12 +103,12 @@ void TestGame::handleKeyEvents() {
 }
 
 void TestGame::update() {
-	//physics engine should handle collisions, TestGame handles setup
+	//physics engine should handle collisions and toggles, TestGame handles setup
 	physics->update();
 
 	//velocity moves the player
-	player->setRootTransform_X(player->getVelocity());
-	player->setRootTransform_Y(player->getVelocity());
+	player->setRootTransform_X(player->getVelocity().x);
+	player->setRootTransform_Y(player->getVelocity().y);
 
 	//collider follows the player (implicit child)
 	player->setColliderTransform_X(player->getRootTransform());
@@ -117,8 +117,7 @@ void TestGame::update() {
 	for (auto line : lines) {
 		if (player->getCollider().intersects(*line)) {
 			player->setSpeed_X(0.f);
-			//box.x -= velocity.x;
-			//player->setRootTransform_X();
+			player->setRootTransform(Vector2f(player->getRootTransform().x - player->getVelocity().x, player->getRootTransform().y));
 			break;
 		}
 	}
@@ -126,8 +125,7 @@ void TestGame::update() {
 	for (auto line : lines) {
 		if (player->getCollider().intersects(*line)) {
 			player->setSpeed_Y(0.f);
-			//box.x -= velocity.x;
-			//player->setRootTransform_Y();
+			player->setRootTransform(Vector2f(player->getRootTransform().x, player->getRootTransform().y - player->getVelocity().y));
 			break;
 		}
 	}
@@ -154,8 +152,8 @@ void TestGame::renderUI() {
 
 	/*WHITE TEXT*/
 	gfx->setDrawColor(SDL_COLOR_WHITE);
-	std::string x_str = std::to_string(player->getRootTransform().x - 185.f);
-	std::string y_str = std::to_string(player->getRootTransform().y - 185.f);
+	std::string x_str = std::to_string(player->getRootTransform().x - 235.f);
+	std::string y_str = std::to_string(player->getRootTransform().y - 235.f);
 	std::string speedX_str = std::to_string(player->getSpeed().x);
 	std::string speedY_str = std::to_string(player->getSpeed().y);
 	std::string speedRes_str = std::to_string(speed_res);

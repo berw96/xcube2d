@@ -2,7 +2,7 @@
 #define __GAME_MATH_H__
 
 #include <cstdlib>
-
+#include <climits>
 #include <SDL_rect.h>
 
 static const float PI_OVER_180 = (float)(3.14159265358979323846 / 180.0f);

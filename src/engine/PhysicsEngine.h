@@ -29,33 +29,64 @@ class PhysicsEngine {
 
 		void registerObject(std::shared_ptr<PhysicsObject>);
 
-		float calculateAcceleration_x(Vector2f& F, float& m);
-		float calculateAcceleration_y(Vector2f& F, float& m);
-		float calculateResultant(Vector2f& v);
+		float calculateAcceleration_x(Vector2f F, float m);
+		float calculateAcceleration_y(Vector2f F, float m);
+		float calculateResultant(Vector2f v);
 };
 
 class PhysicsObject {
 	friend class PhysicsEngine;
 	protected:
 		Point2 center;
+		Rectf collider;
 		float lX, lY, hlX, hlY;	// lengths and half lengths
 
 		/*Variables which affect how a physics object reacts to player input*/
+		Vector2f transform;
 		Vector2f force;
 		Vector2f acceleration;
 		Vector2f velocity;
 		Vector2f speed;
 		float mass;
 
+		std::shared_ptr<std::vector<PhysicsObject>> children;
+
 		void applyForce(const Vector2f &);
 	public:
 		PhysicsObject(const Point2 & center, float x, float y);
+		PhysicsObject(const Point2 & center, float x, float y, float mass);
+		PhysicsObject(const Point2 & center, float x, float y, float mass, Vector2f transform);
 
-		Point2 getCenter() { return center; }
-		float getLengthX() { return lX; }
-		float getLengthY() { return lY; }
-		float getHalfLengthX() { return hlX; }
-		float getHalfLengthY() { return hlY; }
+		Point2 getCenter()						{ return center; }
+		Rectf getCollider()						{ return collider; }
+		float getLengthX()						{ return lX; }
+		float getLengthY()						{ return lY; }
+		float getHalfLengthX()					{ return hlX; }
+		float getHalfLengthY()					{ return hlY; }
+
+		Vector2f getRootTransform()				{ return transform; }
+		Vector2f getForce()						{ return force; }
+		Vector2f getAcceleration()				{ return acceleration; }
+		Vector2f getVelocity()					{ return velocity; }
+		Vector2f getSpeed()						{ return speed; }
+		float getMass()							{ return mass; }
+
+		void setColliderTransform_X(Vector2f t) { collider.x = t.x; }
+		void setColliderTransform_Y(Vector2f t) { collider.y = t.y; }
+		void setRootTransform(Vector2f t)		{ transform = t; }
+		void setRootTransform_X(Vector2f t)		{ transform.x += t.x; }
+		void setRootTransform_Y(Vector2f t)		{ transform.y += t.y; }
+		void setForce_X(Vector2f f)				{ force.x = f.x; }
+		void setForce_Y(Vector2f f)				{ force.y = f.y; }
+		void setAcceleration_X(float a)			{ acceleration.x = a; }
+		void setAcceleration_Y(float a)			{ acceleration.y = a; }
+		void setVelocity(Vector2f v)			{ velocity = v; }
+		void setVelocity_X(float v)				{ velocity.x = v; }
+		void setVelocity_Y(float v)				{ velocity.y = v; }
+		void setSpeed(Vector2f s)				{ speed = s; }
+		void setSpeed_X(float s)				{ speed.x = s; }
+		void setSpeed_Y(float s)				{ speed.y = s; }
+		void setMass(float m);
 
 		bool isColliding(const PhysicsObject & other);
 		/**

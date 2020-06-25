@@ -1,9 +1,12 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), box(235.f, 235.f, 30.f, 30.f), gravityToggled(false), speed(0.f, 0.f), force(0.01f ,0.01f), mass(0.1f), acceleration(0.f, 0.f) {
+TestGame::TestGame() : AbstractGame(), gravityToggled(false), force(0.01f ,0.01f) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 15);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
+
+	/*Creates a player PhysicsObject with a mass and init xy-transform*/
+	player = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
 
 	/*Generates a 1x1 maze with a 500x500 perimeter*/
 	gen = new MazeGenerator(1, 1);
@@ -38,49 +41,50 @@ TestGame::TestGame() : AbstractGame(), box(235.f, 235.f, 30.f, 30.f), gravityTog
 }
 
 TestGame::~TestGame() {
+	delete player;
 	delete gen;
 }
 
 void TestGame::handleKeyEvents() {
 
+	//speed sets the velocity
+	player->setVelocity_X(player->getSpeed().x);
+	player->setVelocity_Y(player->getSpeed().y);
+
 	/*Physics engine calculates the appropriate acceleration
-	for the player box.*/
-	acceleration.x = physics->calculateAcceleration_x(force, mass);
-	acceleration.y = physics->calculateAcceleration_y(force, mass);
+	for the player.*/
+	player->setAcceleration_X(physics->calculateAcceleration_x(force, player->getMass()));
+	player->setAcceleration_Y(physics->calculateAcceleration_y(force, player->getMass()));
 
-	velocity.x = speed.x;
-	velocity.y = speed.y;
-
+	//acceleraton sets the speed
 	if (eventSystem->isPressed(Key::UP) &&
 		gravityToggled != true) {
-		speed.y -= acceleration.y;
+		player->setSpeed_Y(player->getSpeed().y - player->getAcceleration().y);
 	}
 
 	if (eventSystem->isPressed(Key::DOWN) &&
 		gravityToggled != true) {
-		speed.y += acceleration.y;
+		player->setSpeed_Y(player->getSpeed().y + player->getAcceleration().y);
 	}
 
 	if (eventSystem->isPressed(Key::LEFT)) {
-		speed.x -= acceleration.x;
+		player->setSpeed_X(player->getSpeed().x - player->getAcceleration().x);
 	}
 
 	if (eventSystem->isPressed(Key::RIGHT)) {
-		speed.x += acceleration.x;
+		player->setSpeed_X(player->getSpeed().x + player->getAcceleration().x);
 	}
 
 	if (gravityToggled == true) {
-		speed.y += 0.981f;
+		player->setSpeed_Y(player->getSpeed().y + 0.981f);
 	}
 
 	/*Resets the player transform and velocity*/
 	if (eventSystem->isPressed(Key::R)) {
-		box.x = 235.f;
-		box.y = 235.f;
 		gravityToggled = false;
-		speed.x = 0.f;
-		speed.y = 0.f;
-		velocity = Vector2f(0.f,0.f);
+		player->setRootTransform(Vector2f(235.f, 235.f));
+		player->setSpeed(Vector2f(0.f, 0.f));
+		player->setVelocity(Vector2f(0.f,0.f));
 	}
 
 	/*Toggles gravity (ON)*/
@@ -99,29 +103,38 @@ void TestGame::handleKeyEvents() {
 }
 
 void TestGame::update() {
+	//physics engine should handle collisions, TestGame handles setup
 	physics->update();
 
-	box.x += velocity.x;
+	//velocity moves the player
+	player->setRootTransform_X(player->getVelocity());
+	player->setRootTransform_Y(player->getVelocity());
+
+	//collider follows the player (implicit child)
+	player->setColliderTransform_X(player->getRootTransform());
+	player->setColliderTransform_Y(player->getRootTransform());
+
 	for (auto line : lines) {
-		if (box.intersects(*line)) {
-			speed.x = 0.f;
-			box.x -= velocity.x;
+		if (player->getCollider().intersects(*line)) {
+			player->setSpeed_X(0.f);
+			//box.x -= velocity.x;
+			//player->setRootTransform_X();
 			break;
 		}
 	}
 
-	box.y += velocity.y;
 	for (auto line : lines) {
-		if (box.intersects(*line)) {
-			speed.y = 0.f;
-			box.y -= velocity.y;
+		if (player->getCollider().intersects(*line)) {
+			player->setSpeed_Y(0.f);
+			//box.x -= velocity.x;
+			//player->setRootTransform_Y();
 			break;
 		}
 	}
-
-	/*Calculates the resultant velocity of the player box
+	
+	/*Calculates the resultant velocity of the player
 	using Pythagorean theorem.*/
-	speed_res = physics->calculateResultant(speed);
+	speed_res = physics->calculateResultant(player->getSpeed());
 }
 
 void TestGame::render() {
@@ -131,7 +144,7 @@ void TestGame::render() {
 	
 
 	gfx->setDrawColor(SDL_COLOR_AQUA);
-	gfx->drawRect(box);
+	gfx->drawRect(player->getCollider());
 }
 
 /*
@@ -141,11 +154,12 @@ void TestGame::renderUI() {
 
 	/*WHITE TEXT*/
 	gfx->setDrawColor(SDL_COLOR_WHITE);
-	std::string x_str = std::to_string(box.x - 185.f);
-	std::string y_str = std::to_string(box.y - 185.f);
-	std::string speedX_str = std::to_string(speed.x);
-	std::string speedY_str = std::to_string(speed.y);
+	std::string x_str = std::to_string(player->getRootTransform().x - 185.f);
+	std::string y_str = std::to_string(player->getRootTransform().y - 185.f);
+	std::string speedX_str = std::to_string(player->getSpeed().x);
+	std::string speedY_str = std::to_string(player->getSpeed().y);
 	std::string speedRes_str = std::to_string(speed_res);
+	std::string acceleration_str = std::to_string(player->getAcceleration().x);
 	std::string gravityToggle_str;
 
 	if (gravityToggled == true) {
@@ -160,6 +174,9 @@ void TestGame::renderUI() {
 
 	gfx->drawText("V:", 600, 120);
 	gfx->drawText(speedRes_str, 630, 120);
+
+	gfx->drawText("A:", 600, 150);
+	gfx->drawText(acceleration_str, 630, 150);
 
 	/*RED TEXT*/
 	gfx->setDrawColor(SDL_COLOR_RED);

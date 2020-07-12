@@ -1,5 +1,6 @@
 #ifndef __PHYSICS_ENGINE_H__
 #define __PHYSICS_ENGINE_H__
+#define _UNIVERSAL_CONST_GRAVITATION_
 
 #include <vector>
 #include <memory>
@@ -49,15 +50,19 @@ class PhysicsObject {
 		Vector2f velocity;
 		Vector2f speed;
 		float mass;
+		bool canMove;
 
-		std::shared_ptr<std::vector<PhysicsObject>> children;
+		std::vector<std::shared_ptr<PhysicsObject>> children;
+		void registerChild(std::shared_ptr<PhysicsObject>);
 
 		void applyForce(const Vector2f &);
 	public:
 		PhysicsObject(const Point2 & center, float x, float y);
 		PhysicsObject(const Point2 & center, float x, float y, float mass);
 		PhysicsObject(const Point2 & center, float x, float y, float mass, Vector2f transform);
+		PhysicsObject(const Point2 & center, float x, float y, float mass, Vector2f transform, Rectf collider);
 		PhysicsObject(const Point2 & center, float x, float y, Vector2f force, float mass, Vector2f transform);
+		PhysicsObject(const Point2 & center, float x, float y, Vector2f force, float mass, Vector2f transform, Rectf collider);
 
 		Point2 getCenter()						{ return center; }
 		Rectf getCollider()						{ return collider; }
@@ -75,6 +80,9 @@ class PhysicsObject {
 
 		void setColliderTransform_X(Vector2f t) { collider.x = t.x; }
 		void setColliderTransform_Y(Vector2f t) { collider.y = t.y; }
+		void setColliderSize(Vector2f s)		{ collider.w = s.x; collider.h = s.y; }
+		void setColliderSize_X(float s)			{ collider.w = s; }
+		void setColliderSize_Y(float s)			{ collider.h = s; }
 		void setRootTransform(Vector2f t)		{ transform = t; }
 		void setRootTransform_X(float t)		{ transform.x += t; }
 		void setRootTransform_Y(float t)		{ transform.y += t; }

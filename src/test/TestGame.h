@@ -7,15 +7,13 @@
 
 class TestGame : public AbstractGame {
 	private:
-		Rect box;
+		PhysicsObject* PO1;
+		PhysicsObject* PO2;
+		PhysicsObject* PO3;
 
-		int speed;
-		Vector2i velocity;
-
-		MazeGenerator * gen;
-		PhysicsObject* player;
-
-		std::vector<std::shared_ptr<Line2i>> lines;
+		bool gravityToggled;
+		bool UI_Toggled;
+		float speed_res;
 
 		void handleKeyEvents();
 		void update();

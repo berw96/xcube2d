@@ -186,6 +186,10 @@ void GraphicsEngine::drawRect(const Rectangle2 & rect) {
 	SDL_RenderDrawRect(renderer, &rect.getSDLRect());
 }
 
+void GraphicsEngine::drawRect(const Rectangle2f & rect) {
+	SDL_RenderDrawRect(renderer, &rect.getSDLRect());
+}
+
 void GraphicsEngine::drawRect(const Rectangle2 & rect, const SDL_Color & color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 	SDL_RenderDrawRect(renderer, &rect.getSDLRect());

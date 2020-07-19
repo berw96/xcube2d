@@ -1,6 +1,6 @@
 #include "TestGame.h"
 
-TestGame::TestGame() : AbstractGame(), gravityToggled(false), UI_Toggled(true) {
+TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 12);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
@@ -8,7 +8,7 @@ TestGame::TestGame() : AbstractGame(), gravityToggled(false), UI_Toggled(true) {
 	/*Creates a PO1 PhysicsObject with a mass and init xy-transform*/
 	PO1 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
 	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.4f, Vector2f(135.f, 135.f), Rectf(135.f, 135.f, 30.f, 30.f));
-	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.2f, Vector2f(335.f, 335.f), Rectf(335.f, 335.f, 30.f, 30.f));
+	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 200.0f, Vector2f(335.f, 335.f), Rectf(335.f, 335.f, 30.f, 30.f));
 }
 
 TestGame::~TestGame() {
@@ -37,10 +37,6 @@ void TestGame::handleKeyEvents() {
 		PO1->setSpeed_X(PO1->getSpeed().x + PO1->getAcceleration().x);
 	}
 
-	if (gravityToggled == true) {
-		//invoke gravity f = m1.m2.G/r^2 = m1.a
-	}
-
 	/*Toggles UI (ON)*/
 	if (eventSystem->isPressed(Key::U)) {
 		if (UI_Toggled != true) {
@@ -55,23 +51,8 @@ void TestGame::handleKeyEvents() {
 		}
 	}
 
-	/*Toggles gravity (ON)*/
-	if (eventSystem->isPressed(Key::G)) {
-		if (gravityToggled != true) {
-			gravityToggled = true;
-		}
-	}
-	
-	/*Toggles gravity (OFF)*/
-	if (eventSystem->isPressed(Key::T)) {
-		if (gravityToggled != false) {
-			gravityToggled = false;
-		}
-	}
-
 	/*Resets the session*/
 	if (eventSystem->isPressed(Key::R)) {
-		gravityToggled = false;
 		PO1->setRootTransform(Vector2f(235.f, 235.f));
 		PO1->setSpeed(Vector2f(0.f, 0.f));
 		PO1->setVelocity(Vector2f(0.f, 0.f));
@@ -93,7 +74,7 @@ void TestGame::update() {
 	using Pythagorean theorem.*/
 	speed_res = physics->calculateResultant(PO1->getSpeed());
 
-	//speed sets the velocity
+	//speed sets the magnitude of velocity
 	PO1->setVelocity_X(PO1->getSpeed().x);
 	PO1->setVelocity_Y(PO1->getSpeed().y);
 	PO2->setVelocity_X(PO2->getSpeed().x);
@@ -127,7 +108,7 @@ void TestGame::update() {
 	PO3->setColliderTransform_Y(PO3->getRootTransform());
 
 	//PhysicsObject / PhysicsObject collisions
-	if (PO1->getCollider().intersects(PO2->getCollider())) {
+	/*if (PO1->getCollider().intersects(PO2->getCollider())) {
 		PO1->setRootTransform(Vector2f(PO1->getRootTransform().x - PO1->getVelocity().x, PO1->getRootTransform().y));
 		PO2->setSpeed_X(PO1->getSpeed().x + PO2->getSpeed().x);
 	}
@@ -147,6 +128,16 @@ void TestGame::update() {
 		PO3->setSpeed_Y(PO1->getSpeed().y + PO3->getSpeed().y);
 	}
 	
+	if (PO2->getCollider().intersects(PO1->getCollider())) {
+		PO2->setRootTransform(Vector2f(PO2->getRootTransform().x - PO2->getVelocity().x, PO2->getRootTransform().y));
+		PO1->setSpeed_X(PO2->getSpeed().x + PO1->getSpeed().x);
+	}
+	
+	if (PO2->getCollider().intersects(PO1->getCollider())) {
+		PO2->setRootTransform(Vector2f(PO2->getRootTransform().x, PO2->getRootTransform().y - PO2->getVelocity().y));
+		PO1->setSpeed_Y(PO2->getSpeed().y + PO1->getSpeed().y);
+	}
+	
 	if (PO2->getCollider().intersects(PO3->getCollider())) {
 		PO2->setRootTransform(Vector2f(PO2->getRootTransform().x - PO2->getVelocity().x, PO2->getRootTransform().y));
 		PO3->setSpeed_X(PO2->getSpeed().x + PO3->getSpeed().x);
@@ -156,6 +147,20 @@ void TestGame::update() {
 		PO2->setRootTransform(Vector2f(PO2->getRootTransform().x, PO2->getRootTransform().y - PO2->getVelocity().y));
 		PO3->setSpeed_Y(PO2->getSpeed().y + PO3->getSpeed().y);
 	}
+	
+	if (PO3->getCollider().intersects(PO1->getCollider())) {
+		PO3->setRootTransform(Vector2f(PO3->getRootTransform().x - PO3->getVelocity().x, PO3->getRootTransform().y));
+		PO1->setSpeed_X(PO3->getSpeed().x + PO1->getSpeed().x);
+	}
+	
+	if (PO3->getCollider().intersects(PO1->getCollider())) {
+		PO3->setRootTransform(Vector2f(PO3->getRootTransform().x, PO3->getRootTransform().y - PO3->getVelocity().y));
+		PO1->setSpeed_Y(PO3->getSpeed().y + PO1->getSpeed().y);
+	}*/
+
+	//Gravitation
+	PO2->moveTo(PO3->getRootTransform(), physics->calculuateGravitationalForce(*PO2, *PO3));
+	PO3->moveTo(PO2->getRootTransform(), physics->calculuateGravitationalForce(*PO2, *PO3));
 }
 
 /*
@@ -174,24 +179,12 @@ void TestGame::render() {
 	Renders in-game text for the User Interface.
 */
 void TestGame::renderUI() {
-	std::string gravityToggle_str;
 	std::string PO1_tag = "PO1";
 	std::string PO2_tag = "PO2";
 	std::string PO3_tag = "PO3";
 
-	if (gravityToggled == true) {
-		gravityToggle_str = "ON";
-	}
-	if (gravityToggled != true) {
-		gravityToggle_str = "OFF";
-	}
-
 	/*If the UI is toggled it will display the physical fields of the PhysicsObjects*/
 	if (UI_Toggled == true) {
-		/*WHITE TEXT*/
-		gfx->setDrawColor(SDL_COLOR_WHITE);
-		gfx->drawText("Gravity:", 600, 30);
-		gfx->drawText(gravityToggle_str, 645, 30);
 
 		/*AQUA TEXT*/
 		gfx->setDrawColor(SDL_COLOR_AQUA);

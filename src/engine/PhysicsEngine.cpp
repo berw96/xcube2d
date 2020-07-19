@@ -15,18 +15,6 @@ bool PhysicsObject::isColliding(const PhysicsObject & other) {
 	return r1.intersects(r2);
 }
 
-void PhysicsObject::applyForce(const Vector2f & v) {
-	force = v;
-}
-
-void PhysicsObject::applyGravity(const PhysicsEngine & engine) {
-	center += engine.gravity;
-}
-
-void PhysicsObject::applyAntiGravity(const PhysicsEngine & engine) {
-	center -= engine.gravity;
-}
-
 void PhysicsObject::setMass(float m) {
 
 	/*if the provided mass is negative or zero, set to smallest positive value for a float.*/
@@ -35,17 +23,71 @@ void PhysicsObject::setMass(float m) {
 	mass = m;
 }
 
-void PhysicsObject::registerChild(std::shared_ptr<PhysicsObject> child) {
-	children.push_back(child);
+/*
+	Shifts the transform of the PhysicsObject to a given destination.
+	Once it reaches the destination it stops.
+
+	One overload for linear movement, a second for gravitation.
+*/
+void PhysicsObject::moveTo(Vector2f destination) {
+	if (destination.x != getRootTransform().x &&
+		destination.y != getRootTransform().y) {
+		if (destination.x > getRootTransform().x) {
+			//move RIGHT
+			setSpeed_X(1.f);
+		}
+
+		if (destination.x < getRootTransform().x) {
+			//move LEFT
+			setSpeed_X(-1.f);
+		}
+
+		if (destination.y > getRootTransform().y) {
+			//move DOWN
+			setSpeed_Y(1.f);
+		}
+
+		if (destination.y < getRootTransform().y) {
+			//move UP
+			setSpeed_Y(-1.f);
+		}
+	}
+	else {
+		setSpeed(Vector2f(0.f, 0.f));
+	}
+}
+
+void PhysicsObject::moveTo(Vector2f destination, Vector2f f){
+	if (destination.x != getRootTransform().x &&
+		destination.y != getRootTransform().y) {
+		if (destination.x > getRootTransform().x) {
+			//move RIGHT
+			setSpeed_X(getSpeed().x + getAcceleration().x);
+		}
+
+		if (destination.x < getRootTransform().x) {
+			//move LEFT
+			setSpeed_X(getSpeed().x - getAcceleration().x);
+		}
+
+		if (destination.y > getRootTransform().y) {
+			//move DOWN
+			setSpeed_Y(getSpeed().y + getAcceleration().y);
+		}
+
+		if (destination.y < getRootTransform().y) {
+			//move UP
+			setSpeed_Y(getSpeed().y - getAcceleration().y);
+		}
+	}
+	else {
+		setSpeed(Vector2f(0.f, 0.f));
+	}
 }
 
 /* PHYSICS ENGINE */
 
-PhysicsEngine::PhysicsEngine() : gravity(Vector2f(0, DEFAULT_GRAVITY)) {}
-
-void PhysicsEngine::setGravity(float val, float interval) {
-	gravity = Vector2f(0, val * interval);
-}
+PhysicsEngine::PhysicsEngine() {}
 
 void PhysicsEngine::registerObject(std::shared_ptr<PhysicsObject> obj) {
 	objects.push_back(obj);
@@ -53,7 +95,7 @@ void PhysicsEngine::registerObject(std::shared_ptr<PhysicsObject> obj) {
 
 void PhysicsEngine::update() {
 	/*
-		Called from AbstractGame::updatePhysics() to invoke refactored physics behaviour.
+		Called from AbstractGame::updatePhysics(), to invoke refactored physics behaviour.
 	*/
 }
 
@@ -71,6 +113,11 @@ float PhysicsEngine::calculateAcceleration_y(Vector2f F, float m) {
 	return a;
 }
 
+Vector2f PhysicsEngine::calculateMomentum(float m, Vector2f v) {
+	Vector2f mv (m * v.x, m * v.y);
+	return mv;
+}
+
 /*
 	Uses Pythagorean Theorem to calculate the resultant
 	value of a vector's x and y components.
@@ -78,4 +125,34 @@ float PhysicsEngine::calculateAcceleration_y(Vector2f F, float m) {
 float PhysicsEngine::calculateResultant(Vector2f v) {
 	float res = (sqrtf(pow(v.x, 2) + pow(v.y, 2)));
 	return res;
+}
+
+/*
+	Creates a new Vector2f instance containing the displacement
+	between PhysicsObjects a and b on each axis, assigns the
+	resultant to a float and returns its modulus.
+*/
+float PhysicsEngine::calculateRange(PhysicsObject & a, PhysicsObject & b) {
+	Vector2f AB (
+		a.getRootTransform().x - b.getRootTransform().x,
+		a.getRootTransform().y - b.getRootTransform().y);
+
+	float range = calculateResultant(AB);
+	/*if the range is negative or zero, set to smallest positive value for a float.*/
+	if (range <= 0.f) {
+		range = FLT_MIN;
+	}
+	return abs(range);
+}
+
+/*
+	Calculates the product of mass and the set universal constant of
+	gravitation, divides by the range between the two PhysicsObjects
+	(squared) and assigns the result to the return value Vector2f.
+*/
+Vector2f PhysicsEngine::calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b){
+	float gForce = (a.getMass() * b.getMass() * _UNIVERSAL_CONST_GRAVITATION_) / pow(calculateRange(a, b), 2);
+	Vector2f gVector(gForce, gForce);
+	
+	return gVector;
 }

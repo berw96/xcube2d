@@ -11,7 +11,6 @@ class TestGame : public AbstractGame {
 		PhysicsObject* PO2;
 		PhysicsObject* PO3;
 
-		bool gravityToggled;
 		bool UI_Toggled;
 		float speed_res;
 

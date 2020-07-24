@@ -1,22 +1,15 @@
 #include "PhysicsEngine.h"
 #include <iostream>
 
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(1.f), transform(0.f, 0.f), collider(235.f, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(mass), transform(0.f ,0.f), collider(235.f, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass, Vector2f transform) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(mass), transform(transform), collider(235.f, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass, Vector2f transform, Rectf collider) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(mass), transform(transform), collider(collider) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, Vector2f force, float mass, Vector2f transform) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(force), mass(mass), transform(transform), collider(235, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, Vector2f force, float mass, Vector2f transform, Rectf collider) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(force), mass(mass), transform(transform), collider(collider) {}
-
-bool PhysicsObject::isColliding(const PhysicsObject & other) {
-    Rectf r1 = { center.x - hlX, center.y - hlY, lX, lY };
-    Rectf r2 = { other.center.x - other.hlX, other.center.y - other.hlY, other.lX, other.lY };
-
-	return r1.intersects(r2);
-}
+/*PHYSICS OBJECTS*/
+PhysicsObject::PhysicsObject(const Point2& center, float x, float y) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(_DEFAULT_FORCE_), mass(_DEFAULT_MASS_), transform(_DEFAULT_TRANSFORM_), collider(_DEFAULT_COLLIDER_) {}
+PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(_DEFAULT_FORCE_), transform(_DEFAULT_TRANSFORM_), collider(_DEFAULT_COLLIDER_) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass, Vector2f transform) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(_DEFAULT_FORCE_), transform(transform), collider(_DEFAULT_COLLIDER_) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass, Vector2f transform, Rectf collider) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(_DEFAULT_FORCE_), transform(transform), collider(collider) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float x, float y, Vector2f force, float mass, Vector2f transform) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(force), transform(transform), collider(_DEFAULT_COLLIDER_) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float x, float y, Vector2f force, float mass, Vector2f transform, Rectf collider) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(force), transform(transform), collider(collider) { setMass(mass); }
 
 void PhysicsObject::setMass(float m) {
-
 	/*if the provided mass is negative or zero, set to smallest positive value for a float.*/
 	if (m <= 0.f)
 		m = FLT_MIN;
@@ -25,73 +18,79 @@ void PhysicsObject::setMass(float m) {
 
 /*
 	Shifts the transform of the PhysicsObject to a given destination.
-	Once it reaches the destination it stops.
-
-	One overload for linear movement, a second for gravitation.
+	Once it reaches the destination it stops. The PhysicsObject only
+	moves towards the destination if it can move in the first place.
 */
 void PhysicsObject::moveTo(Vector2f destination) {
-	if (destination.x != getRootTransform().x &&
-		destination.y != getRootTransform().y) {
-		if (destination.x > getRootTransform().x) {
-			//move RIGHT
-			setSpeed_X(1.f);
-		}
+	if (autoMove == true) {
+		if (destination.x != getRootTransform().x &&
+			destination.y != getRootTransform().y) {
+			if (destination.x > getRootTransform().x) {
+				//move RIGHT
+				setSpeed_X(getSpeed().x + getAcceleration().x);
+			}
 
-		if (destination.x < getRootTransform().x) {
-			//move LEFT
-			setSpeed_X(-1.f);
-		}
+			if (destination.x < getRootTransform().x) {
+				//move LEFT
+				setSpeed_X(getSpeed().x - getAcceleration().x);
+			}
 
-		if (destination.y > getRootTransform().y) {
-			//move DOWN
-			setSpeed_Y(1.f);
-		}
+			if (destination.y > getRootTransform().y) {
+				//move DOWN
+				setSpeed_Y(getSpeed().y + getAcceleration().y);
+			}
 
-		if (destination.y < getRootTransform().y) {
-			//move UP
-			setSpeed_Y(-1.f);
+			if (destination.y < getRootTransform().y) {
+				//move UP
+				setSpeed_Y(getSpeed().y - getAcceleration().y);
+			}
 		}
-	}
-	else {
-		setSpeed(Vector2f(0.f, 0.f));
+		else {
+			setSpeed(Vector2f(0.f, 0.f));
+		}
 	}
 }
 
-void PhysicsObject::moveTo(Vector2f destination, Vector2f f){
-	if (destination.x != getRootTransform().x &&
-		destination.y != getRootTransform().y) {
-		if (destination.x > getRootTransform().x) {
-			//move RIGHT
-			setSpeed_X(getSpeed().x + getAcceleration().x);
-		}
-
-		if (destination.x < getRootTransform().x) {
-			//move LEFT
-			setSpeed_X(getSpeed().x - getAcceleration().x);
-		}
-
-		if (destination.y > getRootTransform().y) {
-			//move DOWN
-			setSpeed_Y(getSpeed().y + getAcceleration().y);
-		}
-
-		if (destination.y < getRootTransform().y) {
-			//move UP
-			setSpeed_Y(getSpeed().y - getAcceleration().y);
-		}
+void PhysicsObject::registerChild(PhysicsObject & po) {
+	if (po.isChild != true) {
+		children.push_back(po);
+		po.isChild = true;
 	}
-	else {
-		setSpeed(Vector2f(0.f, 0.f));
-	}
+}
+
+void PhysicsObject::forgetChildren() {
+	children.clear();
 }
 
 /* PHYSICS ENGINE */
-
 PhysicsEngine::PhysicsEngine() {}
 
 void PhysicsEngine::registerObject(std::shared_ptr<PhysicsObject> obj) {
 	objects.push_back(obj);
 }
+
+void PhysicsEngine::setMovable(PhysicsObject& po, bool b) {
+	po.autoMove = b;
+}
+
+/*
+	Function checks if two colliders are intersecting, if they are
+	the push function is invoked on them to simulate solidity.
+*/
+void PhysicsEngine::collision(PhysicsObject & a, PhysicsObject & b) {
+	if (a.getCollider().intersects(b.getCollider())){
+		push(a,b);
+	}
+}
+
+/*
+	Function applies a pushing effect on the two PhysicsObjects.
+*/
+void PhysicsEngine::push(PhysicsObject & a, PhysicsObject & b) {
+	a.setRootTransform(Vector2f(a.getRootTransform().x - (a.getVelocity().x - b.getVelocity().x), a.getRootTransform().y));
+	b.setRootTransform(Vector2f(b.getRootTransform().x - (b.getVelocity().x - a.getVelocity().x), b.getRootTransform().y));
+}
+
 
 void PhysicsEngine::update() {
 	/*
@@ -103,18 +102,21 @@ void PhysicsEngine::update() {
 	Functions utilize Newton's equation F=ma to determine the appropriate value 
 	of acceleration to be applied to an object given its mass and a value of force.
 */
-float PhysicsEngine::calculateAcceleration_x(Vector2f F, float m) {
-	float a = F.x / m;
+float PhysicsEngine::calculateAcceleration_x(PhysicsObject & po) {
+	float a = po.getForce().x / po.getMass();
 	return a;
 }
 
-float PhysicsEngine::calculateAcceleration_y(Vector2f F, float m) {
-	float a = F.y / m;
+float PhysicsEngine::calculateAcceleration_y(PhysicsObject & po) {
+	float a = po.getForce().y / po.getMass();
 	return a;
 }
 
-Vector2f PhysicsEngine::calculateMomentum(float m, Vector2f v) {
-	Vector2f mv (m * v.x, m * v.y);
+/*
+	Calculates the momentum of a PhysicsObject and returns it as a vector.
+*/
+Vector2f PhysicsEngine::calculateMomentum(PhysicsObject & po) {
+	Vector2f mv (po.getMass() * po.getVelocity().x, po.getMass() * po.getVelocity().y);
 	return mv;
 }
 
@@ -138,7 +140,8 @@ float PhysicsEngine::calculateRange(PhysicsObject & a, PhysicsObject & b) {
 		a.getRootTransform().y - b.getRootTransform().y);
 
 	float range = calculateResultant(AB);
-	/*if the range is negative or zero, set to smallest positive value for a float.*/
+	/*if the range is negative or zero, set to smallest positive value for a float.
+	This avoids division by zero in calculateGravitationalForce()*/
 	if (range <= 0.f) {
 		range = FLT_MIN;
 	}
@@ -149,10 +152,27 @@ float PhysicsEngine::calculateRange(PhysicsObject & a, PhysicsObject & b) {
 	Calculates the product of mass and the set universal constant of
 	gravitation, divides by the range between the two PhysicsObjects
 	(squared) and assigns the result to the return value Vector2f.
+
+	The closer the PhysicsObjects, the stronger the force between them.
+	By virtue this means that if the range between the two gravitating
+	PhysicsObjects is infinitely small then the force between them and
+	the ensuing acceleration would be infinitely large.
 */
 Vector2f PhysicsEngine::calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b){
 	float gForce = (a.getMass() * b.getMass() * _UNIVERSAL_CONST_GRAVITATION_) / pow(calculateRange(a, b), 2);
 	Vector2f gVector(gForce, gForce);
-	
+
 	return gVector;
+}
+
+/*
+	Calculates the resultant velocity from a collision for each axis
+	and returns it as a vector.
+*/
+Vector2f PhysicsEngine::calculateResultantVelocity(PhysicsObject & po, float t) {
+	Vector2f v2;
+	v2.x = (po.getForce().x * t / po.getMass()) + po.getVelocity().x;
+	v2.y = (po.getForce().y * t / po.getMass()) + po.getVelocity().y;
+
+	return v2;
 }

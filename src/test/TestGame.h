@@ -12,9 +12,12 @@ class TestGame : public AbstractGame {
 		PhysicsObject* PO3;
 
 		bool UI_Toggled;
-		float speed_res;
 
 		void handleKeyEvents();
+		void handleMechanics();
+		void handleCollisions();
+		void handleGravitation();
+		void reset();
 		void update();
 		void render();
 		void renderUI();

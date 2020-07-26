@@ -54,7 +54,7 @@ int AbstractGame::runMainLoop() {
 		}
 
 		gfx->clearScreen();
-		render();
+		renderGeometry();
 		renderUI();
 		gfx->showScreen();
 

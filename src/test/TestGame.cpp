@@ -1,6 +1,7 @@
 #include "TestGame.h"
 
 TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
+#pragma region SETUP
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 12);
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
@@ -16,6 +17,7 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	/*Sets all PhysicsObjects as moveable*/
 	physics->setMovable(*PO1, true);
 	physics->setMovable(*PO2, true);
+#pragma endregion
 }
 
 TestGame::~TestGame() {
@@ -26,7 +28,7 @@ TestGame::~TestGame() {
 }
 
 void TestGame::handleKeyEvents() {
-
+#pragma region EVENTS
 	/*Moves the PO1 PhysicsObject via keypresses.*/
 	//acceleraton sets the speed
 	if (eventSystem->isPressed(Key::UP)) {
@@ -61,22 +63,12 @@ void TestGame::handleKeyEvents() {
 
 	/*Resets the session*/
 	if (eventSystem->isPressed(Key::R)) {
-		PO1->setRootTransform(Vector2f(235.f, 235.f));
-		PO1->setSpeed(Vector2f(0.f, 0.f));
-		PO1->setVelocity(Vector2f(0.f, 0.f));
-		PO2->setRootTransform(Vector2f(135.f, 135.f));
-		PO2->setSpeed(Vector2f(0.f, 0.f));
-		PO2->setVelocity(Vector2f(0.f, 0.f));
-		PO3->setRootTransform(Vector2f(335.f, 335.f));
-		PO3->setSpeed(Vector2f(0.f, 0.f));
-		PO3->setVelocity(Vector2f(0.f, 0.f));
+		reset();
 	}
+#pragma endregion
 }
 
-/*
-	Executes once every tick.
-*/
-void TestGame::update() {
+void TestGame::handleMechanics() {
 #pragma region MECHANICS
 	//speed sets the magnitude of velocity
 	PO1->setVelocity_X(PO1->getSpeed().x);
@@ -113,14 +105,18 @@ void TestGame::update() {
 	PO3->setColliderTransform_X(PO3->getRootTransform().x - PO3->getHalfLengthX());
 	PO3->setColliderTransform_Y(PO3->getRootTransform().y - PO3->getHalfLengthY());
 #pragma endregion
+}
 
+void TestGame::handleCollisions() {
 #pragma region COLLISION
 	//PhysicsObject / PhysicsObject collisions
 	physics->collision(*PO1, *PO2);
 	physics->collision(*PO1, *PO3);
 	physics->collision(*PO2, *PO3);
 #pragma endregion
+}
 
+void TestGame::handleGravitation() {
 #pragma region GRAVITATION
 	/*Physics engine calculates the gravitational force that
 	exists between the gravitating PhysicsObjects*/
@@ -134,10 +130,36 @@ void TestGame::update() {
 #pragma endregion
 }
 
+void TestGame::reset() {
+#pragma region RESET
+	PO1->setRootTransform(Vector2f(235.f, 235.f));
+	PO1->setSpeed(Vector2f(0.f, 0.f));
+	PO1->setVelocity(Vector2f(0.f, 0.f));
+
+	PO2->setRootTransform(Vector2f(135.f, 135.f));
+	PO2->setSpeed(Vector2f(0.f, 0.f));
+	PO2->setVelocity(Vector2f(0.f, 0.f));
+
+	PO3->setRootTransform(Vector2f(335.f, 335.f));
+	PO3->setSpeed(Vector2f(0.f, 0.f));
+	PO3->setVelocity(Vector2f(0.f, 0.f));
+#pragma endregion
+}
+
+/*
+	Executes once every tick.
+*/
+void TestGame::update() {
+	handleMechanics();
+	handleCollisions();
+	handleGravitation();
+}
+
 /*
 	Renders geometry.
 */
-void TestGame::render() {
+void TestGame::renderGeometry() {
+#pragma region GEOMETRY
 	gfx->setDrawColor(SDL_COLOR_AQUA);
 	gfx->drawCircle(Point2(PO1->getRootTransform().x, PO1->getRootTransform().y), 5.0f);
 	gfx->drawRect(PO1->getCollider());
@@ -149,6 +171,7 @@ void TestGame::render() {
 	gfx->setDrawColor(SDL_COLOR_GREEN);
 	gfx->drawCircle(Point2(PO3->getRootTransform().x, PO3->getRootTransform().y), 5.0f);
 	gfx->drawRect(PO3->getCollider());
+#pragma endregion
 }
 
 /*
@@ -159,6 +182,7 @@ void TestGame::renderUI() {
 	std::string PO2_tag = "PO2";
 	std::string PO3_tag = "PO3";
 
+#pragma region USER_INTERFACE
 	/*If the UI is toggled it will display the physical fields of the PhysicsObjects*/
 	if (UI_Toggled == true) {
 
@@ -210,4 +234,5 @@ void TestGame::renderUI() {
 		gfx->drawText("V:", PO3->getCollider().x + 50.f, PO3->getCollider().y + 60.f);
 		gfx->drawText(std::to_string(physics->calculateResultant(PO3->getSpeed())), PO3->getCollider().x + 70.f, PO3->getCollider().y + 60.f);
 	}
+#pragma endregion
 }

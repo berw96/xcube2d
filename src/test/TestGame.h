@@ -19,7 +19,7 @@ class TestGame : public AbstractGame {
 		void handleGravitation();
 		void reset();
 		void update();
-		void render();
+		void renderGeometry();
 		void renderUI();
 	public:
 		TestGame();

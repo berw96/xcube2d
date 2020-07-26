@@ -89,6 +89,7 @@ class PhysicsObject {
 		void setColliderSize(Vector2f s)		{ collider.w = s.x; collider.h = s.y; }
 		void setColliderSize_X(float s)			{ collider.w = s; }
 		void setColliderSize_Y(float s)			{ collider.h = s; }
+		/*The axial setRootTransform functions increment to implement movement.*/
 		void setRootTransform(Vector2f t)		{ transform = t; }
 		void setRootTransform_X(float t)		{ transform.x += t; }
 		void setRootTransform_Y(float t)		{ transform.y += t; }

@@ -16,33 +16,44 @@ void PhysicsObject::setMass(float m) {
 	mass = m;
 }
 
+/*Moves the PhysicsObject instance by incrementing its speed by its acceleration.*/
+void PhysicsObject::move() {
+	setSpeed_X(getSpeed().x + getAcceleration().x);
+	setSpeed_Y(getSpeed().y + getAcceleration().y);
+}
+
 /*
 	Shifts the transform of the PhysicsObject to a given destination.
 	Once it reaches the destination it stops. The PhysicsObject only
 	moves towards the destination if it can move in the first place.
+
+	The destination itself is a singularity, so a buffer must be used
+	to stop the PhysicsObject from moving when in range - this limits
+	the gravitational force to non-infinite values.
 */
 void PhysicsObject::moveTo(Vector2f destination) {
+	float buffer = 100.f;
 	if (autoMove == true) {
-		if (destination.x != getRootTransform().x &&
-			destination.y != getRootTransform().y) {
-			if (destination.x > getRootTransform().x) {
+		if (destination.x != transform.x &&
+			destination.y != transform.y) {
+			if (destination.x > transform.x + buffer) {
 				//move RIGHT
-				setSpeed_X(getSpeed().x + getAcceleration().x);
+				setSpeed_X(speed.x + acceleration.x);
 			}
 
-			if (destination.x < getRootTransform().x) {
+			if (destination.x < transform.x - buffer) {
 				//move LEFT
-				setSpeed_X(getSpeed().x - getAcceleration().x);
+				setSpeed_X(speed.x - acceleration.x);
 			}
 
-			if (destination.y > getRootTransform().y) {
+			if (destination.y > transform.y + buffer) {
 				//move DOWN
-				setSpeed_Y(getSpeed().y + getAcceleration().y);
+				setSpeed_Y(speed.y + acceleration.y);
 			}
 
-			if (destination.y < getRootTransform().y) {
+			if (destination.y < transform.y - buffer) {
 				//move UP
-				setSpeed_Y(getSpeed().y - getAcceleration().y);
+				setSpeed_Y(speed.y - acceleration.y);
 			}
 		}
 		else {
@@ -52,10 +63,7 @@ void PhysicsObject::moveTo(Vector2f destination) {
 }
 
 void PhysicsObject::registerChild(PhysicsObject & po) {
-	if (po.isChild != true) {
 		children.push_back(po);
-		po.isChild = true;
-	}
 }
 
 void PhysicsObject::forgetChildren() {
@@ -73,6 +81,27 @@ void PhysicsEngine::setMovable(PhysicsObject& po, bool b) {
 	po.autoMove = b;
 }
 
+void PhysicsEngine::mechanics(PhysicsObject & po) {
+	//speed sets the magnitude of velocity
+	po.velocity.x = po.speed.x;
+	po.velocity.y = po.speed.y;
+
+	/*Physics engine calculates the appropriate acceleration
+	for each PhysicsObject using its mass and set force vector.*/
+	po.acceleration.x = calculateAcceleration_x(po);
+	po.acceleration.y = calculateAcceleration_y(po);
+
+	//velocity moves PhysicsObjects
+	po.transform.x += (po.velocity.x);
+	po.transform.y += (po.velocity.y);
+
+	/*collider follows PhysicsObject (implicit child component)
+	Half lengths are substracted from the collider's transform
+	to align its center with that of the root component's.*/
+	po.collider.x = po.transform.x - po.hlX;
+	po.collider.y = po.transform.y - po.hlY;
+}
+
 /*
 	Function checks if two colliders are intersecting, if they are
 	the push function is invoked on them to simulate solidity.
@@ -87,8 +116,11 @@ void PhysicsEngine::collision(PhysicsObject & a, PhysicsObject & b) {
 	Function applies a pushing effect on the two PhysicsObjects.
 */
 void PhysicsEngine::push(PhysicsObject & a, PhysicsObject & b) {
-	a.setRootTransform(Vector2f(a.getRootTransform().x - (a.getVelocity().x - b.getVelocity().x), a.getRootTransform().y));
-	b.setRootTransform(Vector2f(b.getRootTransform().x - (b.getVelocity().x - a.getVelocity().x), b.getRootTransform().y));
+	a.setRootTransform(Vector2f(a.getRootTransform().x - (a.getVelocity().x - b.getVelocity().x),
+								a.getRootTransform().y - (a.getVelocity().y - b.getVelocity().y)));
+
+	b.setRootTransform(Vector2f(b.getRootTransform().x - (b.getVelocity().x - a.getVelocity().x),
+								b.getRootTransform().y - (b.getVelocity().y - a.getVelocity().y)));
 }
 
 
@@ -135,17 +167,11 @@ float PhysicsEngine::calculateResultant(Vector2f v) {
 	resultant to a float and returns its modulus.
 */
 float PhysicsEngine::calculateRange(PhysicsObject & a, PhysicsObject & b) {
-	Vector2f AB (
-		a.getRootTransform().x - b.getRootTransform().x,
-		a.getRootTransform().y - b.getRootTransform().y);
+	Vector2f range (a.getRootTransform().x - b.getRootTransform().x,
+					a.getRootTransform().y - b.getRootTransform().y);
 
-	float range = calculateResultant(AB);
-	/*if the range is negative or zero, set to smallest positive value for a float.
-	This avoids division by zero in calculateGravitationalForce()*/
-	if (range <= 0.f) {
-		range = FLT_MIN;
-	}
-	return abs(range);
+	float res_range = calculateResultant(range);
+	return abs(res_range);
 }
 
 /*
@@ -156,12 +182,12 @@ float PhysicsEngine::calculateRange(PhysicsObject & a, PhysicsObject & b) {
 	The closer the PhysicsObjects, the stronger the force between them.
 	By virtue this means that if the range between the two gravitating
 	PhysicsObjects is infinitely small then the force between them and
-	the ensuing acceleration would be infinitely large.
+	the ensuing acceleration would be infinitely large - like a blackhole.
 */
 Vector2f PhysicsEngine::calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b){
-	float gForce = (a.getMass() * b.getMass() * _UNIVERSAL_CONST_GRAVITATION_) / pow(calculateRange(a, b), 2);
-	Vector2f gVector(gForce, gForce);
+	float gForce = ((a.getMass() * b.getMass() * _UNIVERSAL_CONST_GRAVITATION_) / pow(calculateRange(a,b), 2));
 
+	Vector2f gVector (gForce, gForce);
 	return gVector;
 }
 

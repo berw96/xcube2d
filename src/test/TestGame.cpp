@@ -8,8 +8,11 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 
 	/*Creates PhysicsObjects with mass and init xy-transform*/
 	PO1 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
-	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.01f, Vector2f(135.f, 135.f), Rectf(135.f, 135.f, 30.f, 30.f));
-	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 200.0f, Vector2f(335.f, 335.f), Rectf(335.f, 335.f, 30.f, 30.f));
+	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.0001f, Vector2f(435.f, 135.f), Rectf(135.f, 135.f, 30.f, 30.f));
+	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 1000.0f, Vector2f(335.f, 335.f), Rectf(335.f, 335.f, 30.f, 30.f));
+
+	/*Takes the values used in the constructors and saves them for later use.*/
+	setResetParameters();
 
 	/*Registers PO2 as a child of PO1*/
 	PO1->registerChild(*PO2);
@@ -25,6 +28,18 @@ TestGame::~TestGame() {
 	delete PO1;
 	delete PO2;
 	delete PO3;
+}
+
+void TestGame::setResetParameters() {
+	PO1_initRootTransform = PO1->getRootTransform();
+	PO2_initRootTransform = PO2->getRootTransform();
+	PO3_initRootTransform = PO3->getRootTransform();
+	PO1_initSpeed = PO1->getSpeed();
+	PO2_initSpeed = PO2->getSpeed();
+	PO3_initSpeed = PO3->getSpeed();
+	PO1_initVelocity = PO1->getVelocity();
+	PO2_initVelocity = PO2->getVelocity();
+	PO3_initVelocity = PO3->getVelocity();
 }
 
 void TestGame::handleKeyEvents() {
@@ -70,40 +85,9 @@ void TestGame::handleKeyEvents() {
 
 void TestGame::handleMechanics() {
 #pragma region MECHANICS
-	//speed sets the magnitude of velocity
-	PO1->setVelocity_X(PO1->getSpeed().x);
-	PO1->setVelocity_Y(PO1->getSpeed().y);
-	PO2->setVelocity_X(PO2->getSpeed().x);
-	PO2->setVelocity_Y(PO2->getSpeed().y);
-	PO3->setVelocity_X(PO3->getSpeed().x);
-	PO3->setVelocity_Y(PO3->getSpeed().y);
-
-	/*Physics engine calculates the appropriate acceleration
-	for each PhysicsObject using its mass and set force vector.*/
-	PO1->setAcceleration_X(physics->calculateAcceleration_x(*PO1));
-	PO1->setAcceleration_Y(physics->calculateAcceleration_y(*PO1));
-	PO2->setAcceleration_X(physics->calculateAcceleration_x(*PO2));
-	PO2->setAcceleration_Y(physics->calculateAcceleration_y(*PO2));
-	PO3->setAcceleration_X(physics->calculateAcceleration_x(*PO3));
-	PO3->setAcceleration_Y(physics->calculateAcceleration_y(*PO3));
-
-	//velocity moves PhysicsObjects
-	PO1->setRootTransform_X(PO1->getVelocity().x);
-	PO1->setRootTransform_Y(PO1->getVelocity().y);
-	PO2->setRootTransform_X(PO2->getVelocity().x);
-	PO2->setRootTransform_Y(PO2->getVelocity().y);
-	PO3->setRootTransform_X(PO3->getVelocity().x);
-	PO3->setRootTransform_Y(PO3->getVelocity().y);
-
-	/*collider follows PhysicsObject (implicit child component)
-	Half lengths are substracted from the collider's transform
-	to align its center with that of the root components.*/
-	PO1->setColliderTransform_X(PO1->getRootTransform().x - PO1->getHalfLengthX());
-	PO1->setColliderTransform_Y(PO1->getRootTransform().y - PO1->getHalfLengthY());
-	PO2->setColliderTransform_X(PO2->getRootTransform().x - PO2->getHalfLengthX());
-	PO2->setColliderTransform_Y(PO2->getRootTransform().y - PO2->getHalfLengthY());
-	PO3->setColliderTransform_X(PO3->getRootTransform().x - PO3->getHalfLengthX());
-	PO3->setColliderTransform_Y(PO3->getRootTransform().y - PO3->getHalfLengthY());
+	physics->mechanics(*PO1);
+	physics->mechanics(*PO2);
+	physics->mechanics(*PO3);
 #pragma endregion
 }
 
@@ -121,12 +105,11 @@ void TestGame::handleGravitation() {
 	/*Physics engine calculates the gravitational force that
 	exists between the gravitating PhysicsObjects*/
 	PO2->setForce(physics->calculuateGravitationalForce(*PO2, *PO3));
-	PO3->setForce(physics->calculuateGravitationalForce(*PO2, *PO3));
 
-	/*Gravitation; instructs the PhysicsObject to move towards the transform
-	of another using its own acceleration*/
+	/*PhysicsObject moves towards the other using
+	its own acceleration.*/
 	PO2->moveTo(PO3->getRootTransform());
-	PO3->moveTo(PO2->getRootTransform());
+
 #pragma endregion
 }
 

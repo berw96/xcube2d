@@ -13,6 +13,7 @@ class TestGame : public AbstractGame {
 
 		bool UI_Toggled;
 
+		void setResetParameters();
 		void handleKeyEvents();
 		void handleMechanics();
 		void handleCollisions();
@@ -24,6 +25,16 @@ class TestGame : public AbstractGame {
 	public:
 		TestGame();
 		~TestGame();
+
+		Vector2f PO1_initRootTransform;
+		Vector2f PO2_initRootTransform;
+		Vector2f PO3_initRootTransform;
+		Vector2f PO1_initSpeed;
+		Vector2f PO2_initSpeed;
+		Vector2f PO3_initSpeed;
+		Vector2f PO1_initVelocity;
+		Vector2f PO2_initVelocity;
+		Vector2f PO3_initVelocity;
 };
 
 #endif

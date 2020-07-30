@@ -1,6 +1,6 @@
 #ifndef __PHYSICS_ENGINE_H__
 #define __PHYSICS_ENGINE_H__
-#define _UNIVERSAL_CONST_GRAVITATION_ (0.01f)
+#define _UNIVERSAL_CONST_GRAVITATION_ (0.1f)
 #define _DEFAULT_FORCE_ (Vector2f(0.01f, 0.01f))
 #define _DEFAULT_MASS_ (1.f)
 #define _DEFAULT_TRANSFORM_ (Vector2f(0.f, 0.f))
@@ -24,6 +24,7 @@ class PhysicsEngine {
 		void update();
 		void registerObject(std::shared_ptr<PhysicsObject>);
 		void setMovable(PhysicsObject& po, bool b);
+		void mechanics(PhysicsObject & po);
 		void collision(PhysicsObject& a, PhysicsObject & b);
 		void push(PhysicsObject& a, PhysicsObject & b);
 
@@ -54,7 +55,6 @@ class PhysicsObject {
 		Vector2f speed;
 		float mass;
 		bool autoMove;
-		bool isChild;
 		std::vector<PhysicsObject> children;
 
 	public:
@@ -91,8 +91,10 @@ class PhysicsObject {
 		void setColliderSize_Y(float s)			{ collider.h = s; }
 		/*The axial setRootTransform functions increment to implement movement.*/
 		void setRootTransform(Vector2f t)		{ transform = t; }
-		void setRootTransform_X(float t)		{ transform.x += t; }
-		void setRootTransform_Y(float t)		{ transform.y += t; }
+		void setRootTransform_X(float t)		{ transform.x = t; }
+		void setRootTransform_Y(float t)		{ transform.y = t; }
+		void incrementRootTransform_X(float t)	{ transform.x += t; }
+		void incrementRootTransform_Y(float t)	{ transform.y += t; }
 		void setForce(Vector2f f)				{ force = f; }
 		void setForce_X(float f)				{ force.x = f; }
 		void setForce_Y(float f)				{ force.y = f; }
@@ -108,6 +110,7 @@ class PhysicsObject {
 		void setMass(float m);
 #pragma endregion
 
+		void move();
 		void moveTo(Vector2f destination);
 		void registerChild(PhysicsObject & po);
 		void forgetChildren();

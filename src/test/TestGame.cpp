@@ -10,11 +10,12 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	PO1 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
 	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.2f, Vector2f(320.f, 300.f), Rectf(135.f, 135.f, 30.f, 30.f));
 	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 1000.0f, Vector2f(1100.f, 500.f), Rectf(335.f, 335.f, 30.f, 30.f));
+	floor = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 1000.0f, Vector2f(960.f, 1000.f), Rectf(335.f, 335.f, 1000.f, 30.f));
 
-	/*Sets all PhysicsObjects as moveable*/
+	/*Sets PhysicsObjects as moveable*/
 	physics->setMovable(*PO1, true);
 	physics->setMovable(*PO2, true);
-	physics->setMovable(*PO3, true);
+	//physics->setMovable(*PO3, true);
 
 	/*Takes the values used in the constructors and saves them for later use.*/
 	setResetParameters();
@@ -26,6 +27,7 @@ TestGame::~TestGame() {
 	delete PO1;
 	delete PO2;
 	delete PO3;
+	delete floor;
 }
 
 void TestGame::setResetParameters() {
@@ -117,6 +119,7 @@ void TestGame::handleMechanics() {
 	physics->mechanics(*PO1);
 	physics->mechanics(*PO2);
 	physics->mechanics(*PO3);
+	physics->mechanics(*floor);
 #pragma endregion
 }
 
@@ -126,6 +129,7 @@ void TestGame::handleCollisions() {
 	physics->collision(*PO1, *PO2);
 	physics->collision(*PO1, *PO3);
 	physics->collision(*PO2, *PO3);
+	physics->collision(*PO1, *floor);
 #pragma endregion
 }
 
@@ -133,8 +137,8 @@ void TestGame::handleGravitation() {
 #pragma region GRAVITATION
 	/*Physics engine calculates the gravitational force that
 	exists between the gravitating PhysicsObjects*/
-	PO3->incrementForce_X(physics->calculuateGravitationalForce(*PO2, *PO3).x);
-	PO3->incrementForce_Y(physics->calculuateGravitationalForce(*PO2, *PO3).y);
+	PO3->setForce_X(physics->calculuateGravitationalForce(*PO2, *PO3).x);
+	PO3->setForce_Y(physics->calculuateGravitationalForce(*PO2, *PO3).y);
 #pragma endregion
 }
 
@@ -161,6 +165,7 @@ void TestGame::reset() {
 	Executes once every tick.
 */
 void TestGame::update() {
+	physics->update();
 	handleMechanics();
 	handleCollisions();
 	handleGravitation();
@@ -182,6 +187,10 @@ void TestGame::renderGeometry() {
 	gfx->setDrawColor(SDL_COLOR_GREEN);
 	gfx->drawCircle(Point2(PO3->getRootTransform().x, PO3->getRootTransform().y), 5.0f);
 	gfx->drawRect(PO3->getCollider());
+
+	gfx->setDrawColor(SDL_COLOR_WHITE);
+	gfx->drawCircle(Point2(floor->getRootTransform().x, floor->getRootTransform().y), 5.0f);
+	gfx->drawRect(floor->getCollider());
 #pragma endregion
 }
 
@@ -195,14 +204,6 @@ void TestGame::renderUI() {
 	std::string title = "ci517 Game Engine Fundamentals, 19/20: Student ID-17802815";
 	gfx->setDrawColor(SDL_COLOR_WHITE);
 	gfx->drawText(title, 0.f, 0.f);
-
-	/*SDL_Texture* sprite = ResourceManager::loadTexture("res/textures/sprite1.png", SDL_COLOR_GREEN);
-	SDL_Rect* area = new SDL_Rect();
-	area->x = 500;
-	area->y = 500;
-	area->w = 500;
-	area->h = 500;
-	gfx->drawTexture(sprite, area);*/
 
 #pragma region USER_INTERFACE
 	/*If the UI is toggled it will display the physical fields of the PhysicsObjects*/

@@ -10,6 +10,7 @@ class TestGame : public AbstractGame {
 		PhysicsObject* PO1;
 		PhysicsObject* PO2;
 		PhysicsObject* PO3;
+		PhysicsObject* floor;
 
 		bool UI_Toggled;
 
@@ -26,7 +27,7 @@ class TestGame : public AbstractGame {
 		TestGame();
 		~TestGame();
 
-		//PhysicsObject initials - NEEDS REFACTORING
+		//PhysicsObject initial values
 		Vector2f PO1_initRootTransform;
 		Vector2f PO2_initRootTransform;
 		Vector2f PO3_initRootTransform;

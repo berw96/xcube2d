@@ -103,15 +103,15 @@ void PhysicsEngine::mechanics(PhysicsObject & po) {
 		po.transform.x += (po.velocity.x);
 		po.transform.y += (po.velocity.y);
 
-		/*collider follows PhysicsObject (implicit component)
-		Half lengths are substracted from the collider's transform
-		to align its center with that of the root component's.*/
-		po.collider.x = po.transform.x - po.hlX;
-		po.collider.y = po.transform.y - po.hlY;
-
 		/*Instructs the PhysicsObject to move using the above values.*/
 		po.move();
 	}
+
+	/*collider follows PhysicsObject (implicit component)
+		Half lengths are substracted from the collider's transform
+		to align its center with that of the root component's.*/
+	po.collider.x = po.transform.x - po.hlX;
+	po.collider.y = po.transform.y - po.hlY;
 }
 
 /*
@@ -135,8 +135,11 @@ void PhysicsEngine::collision(PhysicsObject & a, PhysicsObject & b) {
 void PhysicsEngine::push(PhysicsObject & a, PhysicsObject & b) {
 	a.transform = (Vector2f(a.transform.x - (a.velocity.x - b.velocity.x),
 							a.transform.y - (a.velocity.y - b.velocity.y)));
-	b.transform = (Vector2f(b.transform.x - (b.velocity.x - a.velocity.x),
-							b.transform.y - (b.velocity.y - a.velocity.y)));
+
+	if (b.autoMove == true) {
+		b.transform = (Vector2f(b.transform.x - (b.velocity.x - a.velocity.x),
+								b.transform.y - (b.velocity.y - a.velocity.y)));
+	}
 }
 
 

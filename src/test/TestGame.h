@@ -26,6 +26,7 @@ class TestGame : public AbstractGame {
 		TestGame();
 		~TestGame();
 
+		//PhysicsObject initials - NEEDS REFACTORING
 		Vector2f PO1_initRootTransform;
 		Vector2f PO2_initRootTransform;
 		Vector2f PO3_initRootTransform;
@@ -35,6 +36,9 @@ class TestGame : public AbstractGame {
 		Vector2f PO1_initVelocity;
 		Vector2f PO2_initVelocity;
 		Vector2f PO3_initVelocity;
+		Vector2f PO1_initForce;
+		Vector2f PO2_initForce;
+		Vector2f PO3_initForce;
 };
 
 #endif

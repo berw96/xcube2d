@@ -1,7 +1,7 @@
 #ifndef __PHYSICS_ENGINE_H__
 #define __PHYSICS_ENGINE_H__
-#define _UNIVERSAL_CONST_GRAVITATION_ (0.1f)
-#define _DEFAULT_FORCE_ (Vector2f(0.01f, 0.01f))
+#define _UNIVERSAL_CONST_GRAVITATION_ (0.02f)
+#define _DEFAULT_FORCE_ (Vector2f(0.f, 0.f))
 #define _DEFAULT_MASS_ (1.f)
 #define _DEFAULT_TRANSFORM_ (Vector2f(0.f, 0.f))
 #define _DEFAULT_COLLIDER_ (Rectf(235.f, 235.f, 30.f, 30.f))
@@ -31,11 +31,14 @@ class PhysicsEngine {
 #pragma region FORMULA
 		float calculateAcceleration_x(PhysicsObject & po);
 		float calculateAcceleration_y(PhysicsObject & po);
-		Vector2f calculateMomentum(PhysicsObject & po);
 		float calculateResultant(Vector2f v);
 		float calculateRange(PhysicsObject & a, PhysicsObject & b);
+		float calculateRange_x(PhysicsObject & a, PhysicsObject & b);
+		float calculateRange_y(PhysicsObject & a, PhysicsObject & b);
 		Vector2f calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b);
 		Vector2f calculateResultantVelocity(PhysicsObject & po, float t);
+		Vector2f calculateMomentum(PhysicsObject & po);
+		Vector2f calculateNetForce(std::vector<PhysicsObject> objects);
 #pragma endregion
 };
 
@@ -53,6 +56,7 @@ class PhysicsObject {
 		Vector2f acceleration;
 		Vector2f velocity;
 		Vector2f speed;
+
 		float mass;
 		bool autoMove;
 		std::vector<PhysicsObject> children;
@@ -98,6 +102,8 @@ class PhysicsObject {
 		void setForce(Vector2f f)				{ force = f; }
 		void setForce_X(float f)				{ force.x = f; }
 		void setForce_Y(float f)				{ force.y = f; }
+		void incrementForce_X(float f)			{ force.x += f; }
+		void incrementForce_Y(float f)			{ force.y += f; }
 		void setAcceleration(Vector2f a)		{ acceleration = a; }
 		void setAcceleration_X(float a)			{ acceleration.x = a; }
 		void setAcceleration_Y(float a)			{ acceleration.y = a; }

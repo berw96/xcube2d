@@ -1,9 +1,9 @@
 #ifndef __PHYSICS_ENGINE_H__
 #define __PHYSICS_ENGINE_H__
-#define _UNIVERSAL_CONST_GRAVITATION_ (0.02f)
-#define _DEFAULT_FORCE_ (Vector2f(0.f, 0.f))
-#define _DEFAULT_MASS_ (1.f)
-#define _DEFAULT_TRANSFORM_ (Vector2f(0.f, 0.f))
+#define _UNIVERSAL_CONST_GRAVITATION_ (0.1f)
+#define _DEFAULT_INIT_FORCE_ (Vector2f(0.f, 0.f))
+#define _DEFAULT_INIT_MASS_ (1.f)
+#define _DEFAULT_INIT_TRANSFORM_ (Vector2f(0.f, 0.f))
 #define _DEFAULT_COLLIDER_ (Rectf(235.f, 235.f, 30.f, 30.f))
 
 #include <vector>
@@ -21,7 +21,6 @@ class PhysicsEngine {
 		std::vector<std::shared_ptr<PhysicsObject>> objects;
 
 	public:
-		void update();
 		void registerObject(std::shared_ptr<PhysicsObject>);
 		void setMovable(PhysicsObject& po, bool b);
 		void mechanics(PhysicsObject & po);
@@ -35,8 +34,7 @@ class PhysicsEngine {
 		float calculateRange(PhysicsObject & a, PhysicsObject & b);
 		float calculateRange_x(PhysicsObject & a, PhysicsObject & b);
 		float calculateRange_y(PhysicsObject & a, PhysicsObject & b);
-		Vector2f calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b);
-		Vector2f calculateResultantVelocity(PhysicsObject & po, float t);
+		Vector2f calculateGravitationalForce(PhysicsObject& a, PhysicsObject& b);
 		Vector2f calculateMomentum(PhysicsObject & po);
 		Vector2f calculateNetForce(std::vector<PhysicsObject> objects);
 #pragma endregion
@@ -116,8 +114,6 @@ class PhysicsObject {
 		void setMass(float m);
 #pragma endregion
 
-		void move();
-		void moveTo(Vector2f destination);
 		void registerChild(PhysicsObject & po);
 		void forgetChildren();
 };

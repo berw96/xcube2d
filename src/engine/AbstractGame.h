@@ -6,7 +6,6 @@
 class AbstractGame {
 	private:
 		void handleMouseEvents();
-		void updatePhysics();
 
 	protected:
 		AbstractGame();

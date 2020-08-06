@@ -38,8 +38,6 @@ class EventEngine {
 		
 		bool isPressed(Key);
 		bool isPressed(Mouse);
-		bool isReleased(Key);
-		bool isReleased(Mouse);
     
         /**
          * Software emulation of keypresses

@@ -8,7 +8,7 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 
 	/*Creates PhysicsObjects with mass and init xy-transform*/
 	PO1 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
-	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.2f, Vector2f(320.f, 300.f), Rectf(135.f, 135.f, 30.f, 30.f));
+	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.5f, Vector2f(320.f, 300.f), Rectf(135.f, 135.f, 30.f, 30.f));
 	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 1000.0f, Vector2f(1100.f, 500.f), Rectf(335.f, 335.f, 30.f, 30.f));
 	floor = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 1000.0f, Vector2f(960.f, 1000.f), Rectf(335.f, 335.f, 1000.f, 30.f));
 
@@ -51,47 +51,19 @@ void TestGame::handleKeyEvents() {
 	a state of de facto movement at all times, but will only
 	move when a force is applied to it*/
 	//acceleraton sets the speed
-	/*PO1 controls*/
-	if (eventSystem->isPressed(Key::UP)) {
-		PO1->incrementForce_Y(-0.0001f);
-	}
-	if (eventSystem->isPressed(Key::DOWN)) {
-		PO1->incrementForce_Y(0.0001f);
-	}
-	if (eventSystem->isPressed(Key::LEFT)) {
-		PO1->incrementForce_X(-0.0001f);
-	}
-	if (eventSystem->isPressed(Key::RIGHT)) {
-		PO1->incrementForce_X(0.0001f);
-	}
 
-	/*PO2 controls*/
-	if (eventSystem->isPressed(Key::W)) {
-		PO2->incrementForce_Y(-0.0001f);
-	}
-	if (eventSystem->isPressed(Key::S)) {
-		PO2->incrementForce_Y(0.0001f);
-	}
-	if (eventSystem->isPressed(Key::A)) {
-		PO2->incrementForce_X(-0.0001f);
-	}
-	if (eventSystem->isPressed(Key::D)) {
-		PO2->incrementForce_X(0.0001f);
-	}
-	
-	/*PO3 controls*/
-	if (eventSystem->isPressed(Key::T)) {
-		PO3->incrementForce_Y(-0.0001f);
-	}
-	if (eventSystem->isPressed(Key::G)) {
-		PO3->incrementForce_Y(0.0001f);
-	}
-	if (eventSystem->isPressed(Key::F)) {
-		PO3->incrementForce_X(-0.0001f);
-	}
-	if (eventSystem->isPressed(Key::H)) {
-		PO3->incrementForce_X(0.0001f);
-	}
+	/*PO1 controls*/
+	if (eventSystem->isPressed(Key::UP))
+		PO1->incrementForce_Y(-0.0001f);
+
+	if (eventSystem->isPressed(Key::DOWN))
+		PO1->incrementForce_Y(0.0001f);
+
+	if (eventSystem->isPressed(Key::LEFT))
+		PO1->incrementForce_X(-0.0001f);
+
+	if (eventSystem->isPressed(Key::RIGHT))
+		PO1->incrementForce_X(0.0001f);
 
 	/*Toggles UI (ON)*/
 	if (eventSystem->isPressed(Key::U)) {
@@ -128,7 +100,7 @@ void TestGame::handleCollisions() {
 	//PhysicsObject / PhysicsObject collisions
 	physics->collision(*PO1, *PO2);
 	physics->collision(*PO1, *PO3);
-	physics->collision(*PO2, *PO3);
+	//physics->collision(*PO2, *PO3);
 	physics->collision(*PO1, *floor);
 #pragma endregion
 }
@@ -137,8 +109,9 @@ void TestGame::handleGravitation() {
 #pragma region GRAVITATION
 	/*Physics engine calculates the gravitational force that
 	exists between the gravitating PhysicsObjects*/
-	PO3->setForce_X(physics->calculuateGravitationalForce(*PO2, *PO3).x);
-	PO3->setForce_Y(physics->calculuateGravitationalForce(*PO2, *PO3).y);
+
+	PO3->setForce(physics->calculateGravitationalForce(*PO2, *PO3));
+	PO2->setForce(physics->calculateGravitationalForce(*PO2, *PO3));
 #pragma endregion
 }
 
@@ -165,7 +138,6 @@ void TestGame::reset() {
 	Executes once every tick.
 */
 void TestGame::update() {
-	physics->update();
 	handleMechanics();
 	handleCollisions();
 	handleGravitation();

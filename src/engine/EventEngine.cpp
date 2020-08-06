@@ -73,14 +73,6 @@ bool EventEngine::isPressed(Mouse btn) {
 	return buttons[btn];
 }
 
-bool EventEngine::isReleased(Key key) {
-	return keys[key];
-}
-
-bool EventEngine::isReleased(Mouse btn) {
-	return buttons[btn];
-}
-
 void EventEngine::setMouseRelative(bool b) {
 	if (SDL_SetRelativeMouseMode(b ? SDL_TRUE : SDL_FALSE) < 0) {
 #ifdef __DEBUG

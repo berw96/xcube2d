@@ -48,7 +48,6 @@ int AbstractGame::runMainLoop() {
 
 		if (!paused) {
 			update();
-			updatePhysics();
 
 			gameTime += 0.016;	// 60 times a sec
 		}
@@ -71,10 +70,6 @@ int AbstractGame::runMainLoop() {
 void AbstractGame::handleMouseEvents() {
 	if (eventSystem->isPressed(Mouse::BTN_LEFT)) onLeftMouseButton();
 	if (eventSystem->isPressed(Mouse::BTN_RIGHT)) onRightMouseButton();
-}
-
-void AbstractGame::updatePhysics() {
-	physics->update();
 }
 
 void AbstractGame::onLeftMouseButton() {}

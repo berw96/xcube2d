@@ -10,14 +10,12 @@ class TestGame : public AbstractGame {
 		PhysicsObject* PO1;
 		PhysicsObject* PO2;
 		PhysicsObject* PO3;
-		PhysicsObject* floor;
 
 		bool UI_Toggled;
 
 		void setResetParameters();
 		void handleKeyEvents();
 		void handleMechanics();
-		void handleCollisions();
 		void handleGravitation();
 		void reset();
 		void update();
@@ -28,9 +26,9 @@ class TestGame : public AbstractGame {
 		~TestGame();
 
 		//PhysicsObject initial values
-		Vector2f PO1_initRootTransform;
-		Vector2f PO2_initRootTransform;
-		Vector2f PO3_initRootTransform;
+		Vector2f PO1_initTransform;
+		Vector2f PO2_initTransform;
+		Vector2f PO3_initTransform;
 		Vector2f PO1_initSpeed;
 		Vector2f PO2_initSpeed;
 		Vector2f PO3_initSpeed;

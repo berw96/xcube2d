@@ -11,6 +11,7 @@
 
 #include "EngineCommon.h"
 #include "GameMath.h"
+#include "PhysicsEngine.h"
 
 /* ENGINE DEFAULT SETTINGS */
 //High Definition
@@ -101,6 +102,8 @@ class GraphicsEngine {
 
 		void setDrawColor(const SDL_Color &);
 		void setDrawScale(const Vector2f &);	// not tested
+
+		void drawPhysicsUI(PhysicsObject & po);
 
 		/**
 		* @param fileName - name of the icon file

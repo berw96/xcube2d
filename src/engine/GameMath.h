@@ -5,8 +5,9 @@
 #include <climits>
 #include <SDL_rect.h>
 
-static const float PI_OVER_180 = (float)(3.14159265358979323846 / 180.0f);
-static const float _180_OVER_PI = (float)(180.0f / 3.14159265358979323846);
+static const float PI_OVER_180 = (float)(3.14159265358979323846f / 180.0f);
+static const float _180_OVER_PI = (float)(180.0f / 3.14159265358979323846f);
+static const float PI = (3.14159265358979323846f);
 
 inline float toRadians(float deg) {
 	return deg * PI_OVER_180;

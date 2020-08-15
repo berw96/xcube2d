@@ -7,20 +7,15 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	gfx->setVerticalSync(true);
 
 	/*Creates PhysicsObjects with mass and init xy-transform*/
-	PO1 = new PhysicsObject(Point2(0.f, 0.f), 10.f, Vector2f(800.f, 1000.f));
-	PO2 = new PhysicsObject(Point2(0.f, 0.f), 20.f, Vector2f(800.f, 300.f), 10.f);
-	PO3 = new PhysicsObject(Point2(0.f, 0.f), 50.0f, Vector2f(1100.f, 500.f), 60.f, "Sun");
 
-	PO1->setTag("Earth");
-	PO2->setTag("Moon");
+	physics->registerObject(PO1);
+	physics->registerObject(PO2);
+	physics->registerObject(PO3);
+
 #pragma endregion
 }
 
 TestGame::~TestGame() {
-	/*Deletes raw pointers - memory management*/
-	delete PO1;
-	delete PO2;
-	delete PO3;
 }
 
 void TestGame::handleKeyEvents() {
@@ -58,26 +53,7 @@ void TestGame::handleKeyEvents() {
 
 void TestGame::handleMechanics() {
 #pragma region MECHANICS
-	physics->mechanics(*PO1);
-	physics->mechanics(*PO2);
-	physics->mechanics(*PO3);
-#pragma endregion
-}
-
-void TestGame::handleForces() {
-#pragma region GRAVITATION
-	/*Physics engine calculates the gravitational force that
-	exists between the gravitating PhysicsObjects*/
-
-	/*BUGGED - FLINGS GAME OBJECTS AWAY WHEN THEY'RE CLOSE ENOUGH*/
-	/*physics->calculateGravitationalForce(*PO3, *PO1);
-	physics->calculateGravitationalForce(*PO3, *PO2);
-	physics->calculateGravitationalForce(*PO2, *PO3);*/
-
-	/*BUGGED - DOESN'T WORK DUE TO FAULTY PO VECTOR REGISTRATION*/
-	physics->calculateNetForce(*PO1, *PO2, *PO3);
-	physics->calculateNetForce(*PO2, *PO1, *PO3);
-	physics->calculateNetForce(*PO3, *PO2, *PO1);
+	physics->mechanics();
 #pragma endregion
 }
 
@@ -86,7 +62,6 @@ void TestGame::handleForces() {
 */
 void TestGame::update() {
 	handleMechanics();
-	handleForces();
 }
 
 /*

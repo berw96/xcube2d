@@ -19,29 +19,26 @@ class PhysicsEngine {
 	private:
 #pragma region IMPLEMENTATION
 		PhysicsEngine();
-		PhysicsEngine(PhysicsObject & objects);
-		std::vector<PhysicsObject> objects;
+		std::vector<std::shared_ptr<PhysicsObject>> objects;
 
 	public:
-		std::vector<PhysicsObject> getObjects() { return objects; };
-		void registerObject(PhysicsObject & obj);
-		void mechanics(PhysicsObject & po);
+		void registerObject(std::shared_ptr<PhysicsObject> obj);
+		void mechanics();
 #pragma endregion
 
 #pragma region FORMULA
+		Vector2f calculateGravitationalForce(PhysicsObject& target, PhysicsObject& satellite);
+		Vector2f calculateNetGravitationalForce(PhysicsObject& satellite);
 		float calculateResultant(Vector2f v);
 		float calculateRange(PhysicsObject& a, PhysicsObject& b);
 		void calculateOrbitalPeriod(PhysicsObject& a, PhysicsObject& b);
 		void calculateRequiredVelocity(PhysicsObject& a, PhysicsObject& b);
 		void calculateMomentum(PhysicsObject& po);
-		Vector2f calculateGravitationalForce(PhysicsObject& target, PhysicsObject& satellite);
-		Vector2f calculateGravitationalForce(PhysicsObject& satellite);
-		void calculateNetForce(PhysicsObject& a, PhysicsObject& b, PhysicsObject& c);
+		void calculateNetForce(PhysicsObject & po);
 #pragma endregion
 };
 
 class PhysicsObject {
-	//Gives the PhysicsEngine access to the private and protected members of PhysicsObject.
 	friend class PhysicsEngine;
 	protected:
 		std::string tag;
@@ -72,20 +69,20 @@ class PhysicsObject {
 #pragma endregion
 
 #pragma region GETTERS
-		std::string getTag()					{ return tag; }
-		Point2 getCenter()						{ return center; }
-		Vector2f getTransform()					{ return transform; }
-		Vector2f getNetForce()					{ return netForce; }
-		Vector2f getGravitationalForce()		{ return gravitationalForce; }
-		Vector2f getBoostForce()				{ return boostForce; }
-		Vector2f getAcceleration()				{ return acceleration; }
-		Vector2f getVelocity()					{ return velocity; }
-		Vector2f getSpeed()						{ return speed; }
-		Vector2f getMomentum()					{ return momentum; }
-		Vector2f getRequiredVelocity()			{ return reqVelocity; }
-		float getMass()							{ return mass; }
-		float getPeriod()						{ return period; }
-		float getRadius()						{ return radius; }
+		std::string getTag()					const { return tag; }
+		Point2 getCenter()						const { return center; }
+		Vector2f getTransform()					const { return transform; }
+		Vector2f getNetForce()					const { return netForce; }
+		Vector2f getGravitationalForce()		const { return gravitationalForce; }
+		Vector2f getBoostForce()				const { return boostForce; }
+		Vector2f getAcceleration()				const { return acceleration; }
+		Vector2f getVelocity()					const { return velocity; }
+		Vector2f getSpeed()						const { return speed; }
+		Vector2f getMomentum()					const { return momentum; }
+		Vector2f getRequiredVelocity()			const { return reqVelocity; }
+		float getMass()							const { return mass; }
+		float getPeriod()						const { return period; }
+		float getRadius()						const { return radius; }
 #pragma endregion
 
 #pragma region SETTERS

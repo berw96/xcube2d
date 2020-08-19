@@ -6,8 +6,6 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
 
-	/*Creates PhysicsObjects with mass and init xy-transform*/
-
 	physics->registerObject(PO1);
 	physics->registerObject(PO2);
 	physics->registerObject(PO3);
@@ -53,6 +51,7 @@ void TestGame::handleKeyEvents() {
 
 void TestGame::handleMechanics() {
 #pragma region MECHANICS
+	// CI517 physics subsystem implementation
 	physics->mechanics();
 #pragma endregion
 }

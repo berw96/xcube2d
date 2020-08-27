@@ -1,5 +1,9 @@
 #ifndef __PHYSICS_ENGINE_H__
 #define __PHYSICS_ENGINE_H__
+#define _UNIVERSAL_CONST_GRAVITATION_ (0.01f)
+#define _DEFAULT_INIT_MASS_ (1.f)
+#define _DEFAULT_INIT_TRANSFORM_ (Vector2f(0.f, 0.f))
+#define _DEFAULT_RADIUS_ (10.f)
 
 #include <vector>
 #include <string>
@@ -10,7 +14,6 @@
 class PhysicsObject;
 
 class PhysicsEngine {
-#define _UNIVERSAL_CONST_GRAVITATION_ (0.002f)
 	friend class XCube2Engine;
 	friend class PhysicsObject;
 	private:
@@ -24,19 +27,18 @@ class PhysicsEngine {
 #pragma endregion
 
 #pragma region FORMULA
-		Vector2f calculateNetGravitationalForce(std::shared_ptr<PhysicsObject> satellite);
+		Vector2f calculateGravitationalForce(PhysicsObject& target, PhysicsObject& satellite);
+		Vector2f calculateNetGravitationalForce(PhysicsObject& satellite);
 		float calculateResultant(Vector2f v);
-		float calculateRange(std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b);
-		void calculateOrbitalPeriod(std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b);
-		void calculateRequiredVelocity(std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b);
-		void calculateNetForce(std::shared_ptr<PhysicsObject> po);
+		float calculateRange(PhysicsObject& a, PhysicsObject& b);
+		void calculateOrbitalPeriod(PhysicsObject& a, PhysicsObject& b);
+		void calculateRequiredVelocity(PhysicsObject& a, PhysicsObject& b);
+		void calculateMomentum(PhysicsObject& po);
+		void calculateNetForce(PhysicsObject & po);
 #pragma endregion
 };
 
 class PhysicsObject {
-#define _DEFAULT_INIT_MASS_ (1.f)
-#define _DEFAULT_INIT_TRANSFORM_ (Vector2f(0.f, 0.f))
-#define _DEFAULT_RADIUS_ (10.f)
 	friend class PhysicsEngine;
 	protected:
 		std::string tag;
@@ -49,6 +51,7 @@ class PhysicsObject {
 		Vector2f acceleration;
 		Vector2f velocity;
 		Vector2f speed;
+		Vector2f momentum;
 		Vector2f reqVelocity;
 		float mass;
 		float period;
@@ -75,6 +78,7 @@ class PhysicsObject {
 		Vector2f getAcceleration()				const { return acceleration; }
 		Vector2f getVelocity()					const { return velocity; }
 		Vector2f getSpeed()						const { return speed; }
+		Vector2f getMomentum()					const { return momentum; }
 		Vector2f getRequiredVelocity()			const { return reqVelocity; }
 		float getMass()							const { return mass; }
 		float getPeriod()						const { return period; }

@@ -138,22 +138,19 @@ void GraphicsEngine::useFont(TTF_Font * _font) {
 }
 
 void GraphicsEngine::drawPhysicsUI(PhysicsObject & po) {
-	float fieldBuffer_X = 50.f;
-	float valueBuffer_X = 90.f;
-
-	drawText(po.getTag(), po.getCenter().x - po.getTag().length() * 10.f, po.getCenter().y);
-	drawText("X:", po.getCenter().x + po.getRadius() + fieldBuffer_X, po.getCenter().y - 30.f);
-	drawText(std::to_string(po.getTransform().x), po.getCenter().x + po.getRadius() + valueBuffer_X, po.getCenter().y - 30.f);
-	drawText("Y:", po.getCenter().x + po.getRadius() + fieldBuffer_X, po.getCenter().y);
-	drawText(std::to_string(po.getTransform().y), po.getCenter().x + po.getRadius() + valueBuffer_X, po.getCenter().y);
-	drawText("F:", po.getCenter().x + po.getRadius() + fieldBuffer_X, po.getCenter().y + 30.f);
-	drawText(std::to_string(po.getNetForce().x), po.getCenter().x + po.getRadius() + valueBuffer_X, po.getCenter().y + 30.f);
-	drawText("M:", po.getCenter().x + po.getRadius() + fieldBuffer_X, po.getCenter().y + 60.f);
-	drawText(std::to_string(po.getMass()), po.getCenter().x + po.getRadius() + valueBuffer_X, po.getCenter().y + 60.f);
-	drawText("A:", po.getCenter().x + po.getRadius() + fieldBuffer_X, po.getCenter().y + 90.f);
-	drawText(std::to_string(po.getAcceleration().x), po.getCenter().x + po.getRadius() + valueBuffer_X, po.getCenter().y + 90.f);
-	drawText("V:", po.getCenter().x + po.getRadius() + fieldBuffer_X, po.getCenter().y + 120.f);
-	drawText(std::to_string(po.getVelocity().x), po.getCenter().x + po.getRadius() + valueBuffer_X, po.getCenter().y + 120.f);
+	drawText(po.getTag(), po.getCenter().x - po.getTag().length() * 10.f, po.getCenter().y - po.getRadius() - 40.f);
+	drawText("X:", po.getCenter().x + 50.f, po.getCenter().y - 30.f);
+	drawText(std::to_string(po.getTransform().x), po.getCenter().x + 90.f, po.getCenter().y - 30.f);
+	drawText("Y:", po.getCenter().x + 50.f, po.getCenter().y);
+	drawText(std::to_string(po.getTransform().y), po.getCenter().x + 90.f, po.getCenter().y);
+	drawText("F:", po.getCenter().x + 50.f, po.getCenter().y + 30.f);
+	drawText(std::to_string(po.getNetForce().x), po.getCenter().x + 90.f, po.getCenter().y + 30.f);
+	drawText("M:", po.getCenter().x + 50.f, po.getCenter().y + 60.f);
+	drawText(std::to_string(po.getMass()), po.getCenter().x + 90.f, po.getCenter().y + 60.f);
+	drawText("A:", po.getCenter().x + 50.f, po.getCenter().y + 90.f);
+	drawText(std::to_string(po.getAcceleration().x), po.getCenter().x + 90.f, po.getCenter().y + 90.f);
+	drawText("V:", po.getCenter().x + 50.f, po.getCenter().y + 120.f);
+	drawText(std::to_string(po.getVelocity().x), po.getCenter().x + 90.f, po.getCenter().y + 120.f);
 }
 
 void GraphicsEngine::setFrameStart() {

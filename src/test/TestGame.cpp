@@ -5,10 +5,20 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	gfx->useFont(font);
 	gfx->setVerticalSync(true);
 
+<<<<<<< HEAD
 	/*Creates a PO1 PhysicsObject with a mass and init xy-transform*/
 	PO1 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
 	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.4f, Vector2f(135.f, 135.f), Rectf(135.f, 135.f, 30.f, 30.f));
 	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 200.0f, Vector2f(335.f, 335.f), Rectf(335.f, 335.f, 30.f, 30.f));
+=======
+	/*Creates PhysicsObjects with mass and init xy-transform*/
+
+	physics->registerObject(PO1);
+	physics->registerObject(PO2);
+	physics->registerObject(PO3);
+
+#pragma endregion
+>>>>>>> parent of 6d5bfae... 190820-14:56
 }
 
 TestGame::~TestGame() {
@@ -51,6 +61,7 @@ void TestGame::handleKeyEvents() {
 		}
 	}
 
+<<<<<<< HEAD
 	/*Resets the session*/
 	if (eventSystem->isPressed(Key::R)) {
 		PO1->setRootTransform(Vector2f(235.f, 235.f));
@@ -63,6 +74,12 @@ void TestGame::handleKeyEvents() {
 		PO3->setSpeed(Vector2f(0.f, 0.f));
 		PO3->setVelocity(Vector2f(0.f, 0.f));
 	}
+=======
+void TestGame::handleMechanics() {
+#pragma region MECHANICS
+	physics->mechanics();
+#pragma endregion
+>>>>>>> parent of 6d5bfae... 190820-14:56
 }
 
 /*

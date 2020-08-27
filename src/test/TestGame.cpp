@@ -173,6 +173,8 @@ void TestGame::render() {
 	gfx->drawRect(PO2->getCollider());
 	gfx->setDrawColor(SDL_COLOR_GREEN);
 	gfx->drawRect(PO3->getCollider());
+	gfx->setDrawColor(SDL_COLOR_WHITE);
+	gfx->drawCircle(Point2(PO3->getRootTransform().x, PO3->getRootTransform().y), 1.f);
 }
 
 /*

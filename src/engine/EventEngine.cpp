@@ -45,6 +45,8 @@ void EventEngine::updateKeys(const SDL_Keycode &key, bool keyDown) {
 		case SDLK_t:		index = Key::T; break;
 		case SDLK_i:		index = Key::I; break;
 		case SDLK_u:		index = Key::U; break;
+		case SDLK_f:		index = Key::F; break;
+		case SDLK_h:		index = Key::H; break;
 		default:
 			return;	// we don't care about other keys, at least now
 	}
@@ -60,6 +62,9 @@ void EventEngine::setPressed(Mouse btn) {
     buttons[btn] = true;
 }
 
+/*
+	Key presses and releases.
+*/
 bool EventEngine::isPressed(Key key) {
 	return keys[key];
 }

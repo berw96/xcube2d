@@ -11,10 +11,12 @@
 
 #include "EngineCommon.h"
 #include "GameMath.h"
+#include "PhysicsEngine.h"
 
 /* ENGINE DEFAULT SETTINGS */
-static const int DEFAULT_WINDOW_WIDTH = 800;
-static const int DEFAULT_WINDOW_HEIGHT = 800;
+//High Definition
+static const int DEFAULT_WINDOW_WIDTH = 1920;
+static const int DEFAULT_WINDOW_HEIGHT = 1080;
 
 static const SDL_Color SDL_COLOR_GRAY	= { 0x80, 0x80, 0x80 };
 static const SDL_Color SDL_COLOR_YELLOW = { 0xFF, 0xFF, 0 };
@@ -100,6 +102,8 @@ class GraphicsEngine {
 
 		void setDrawColor(const SDL_Color &);
 		void setDrawScale(const Vector2f &);	// not tested
+
+		void drawPhysicsUI(PhysicsObject & po);
 
 		/**
 		* @param fileName - name of the icon file

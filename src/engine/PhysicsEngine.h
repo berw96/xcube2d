@@ -1,8 +1,8 @@
 #ifndef __PHYSICS_ENGINE_H__
 #define __PHYSICS_ENGINE_H__
-#define _UNIVERSAL_CONST_GRAVITATION_ (100.f)
 
 #include <vector>
+#include <string>
 #include <memory>
 
 #include "GameMath.h"
@@ -10,94 +10,83 @@
 class PhysicsObject;
 
 class PhysicsEngine {
+#define _UNIVERSAL_CONST_GRAVITATION_ (0.002f)
 	friend class XCube2Engine;
 	friend class PhysicsObject;
 	private:
+#pragma region IMPLEMENTATION
 		PhysicsEngine();
-
 		std::vector<std::shared_ptr<PhysicsObject>> objects;
 
 	public:
-		void update();
+		void registerObject(std::shared_ptr<PhysicsObject> obj);
+		void mechanics();
+#pragma endregion
 
-		void registerObject(std::shared_ptr<PhysicsObject>);
 #pragma region FORMULA
-		float calculateAcceleration_x(Vector2f F, float m);
-		float calculateAcceleration_y(Vector2f F, float m);
-		Vector2f calculateMomentum(float m, Vector2f v);
+		Vector2f calculateNetGravitationalForce(std::shared_ptr<PhysicsObject> satellite);
 		float calculateResultant(Vector2f v);
-		float calculateRange(PhysicsObject & a, PhysicsObject & b);
-		Vector2f calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b);
+		float calculateRange(std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b);
+		void calculateOrbitalPeriod(std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b);
+		void calculateRequiredVelocity(std::shared_ptr<PhysicsObject> a, std::shared_ptr<PhysicsObject> b);
+		void calculateNetForce(std::shared_ptr<PhysicsObject> po);
 #pragma endregion
 };
 
 class PhysicsObject {
+#define _DEFAULT_INIT_MASS_ (1.f)
+#define _DEFAULT_INIT_TRANSFORM_ (Vector2f(0.f, 0.f))
+#define _DEFAULT_RADIUS_ (10.f)
 	friend class PhysicsEngine;
 	protected:
+		std::string tag;
+#pragma region FIELDS
 		Point2 center;
-		Rectf collider;
-		float lX, lY, hlX, hlY;	// lengths and half lengths
-
-		/*Variables which affect how a physics object reacts to player input*/
 		Vector2f transform;
-		Vector2f force;
+		Vector2f netForce;
+		Vector2f gravitationalForce;
+		Vector2f boostForce;
 		Vector2f acceleration;
 		Vector2f velocity;
 		Vector2f speed;
+		Vector2f reqVelocity;
 		float mass;
-		Vector2f momentum;
-		bool autoMove;
+		float period;
+		float radius;
+#pragma endregion
 
 	public:
-		PhysicsObject(const Point2 & center, float x, float y);
-		PhysicsObject(const Point2 & center, float x, float y, float mass);
-		PhysicsObject(const Point2 & center, float x, float y, float mass, Vector2f transform);
-		PhysicsObject(const Point2 & center, float x, float y, float mass, Vector2f transform, Rectf collider);
-		PhysicsObject(const Point2 & center, float x, float y, Vector2f force, float mass, Vector2f transform);
-		PhysicsObject(const Point2 & center, float x, float y, Vector2f force, float mass, Vector2f transform, Rectf collider);
+#pragma region CONSTRUCTORS
+		PhysicsObject(const Point2 & center);
+		PhysicsObject(const Point2 & center, float mass);
+		PhysicsObject(const Point2 & center, float mass, Vector2f transform);
+		PhysicsObject(const Point2 & center, float mass, Vector2f transform, float radius);
+		PhysicsObject(const Point2 & center, float mass, Vector2f transform, float radius, std::string tag);
+		PhysicsObject(const Point2 & center, float mass, Vector2f transform, float radius, std::string tag, Vector2f boostForce);
+#pragma endregion
 
 #pragma region GETTERS
-		Point2 getCenter()						{ return center; }
-		Rectf getCollider()						{ return collider; }
-		float getLengthX()						{ return lX; }
-		float getLengthY()						{ return lY; }
-		float getHalfLengthX()					{ return hlX; }
-		float getHalfLengthY()					{ return hlY; }
-
-		Vector2f getRootTransform()				{ return transform; }
-		Vector2f getForce()						{ return force; }
-		Vector2f getAcceleration()				{ return acceleration; }
-		Vector2f getVelocity()					{ return velocity; }
-		Vector2f getSpeed()						{ return speed; }
-		float getMass()							{ return mass; }
+		std::string getTag()					const { return tag; }
+		Point2 getCenter()						const { return center; }
+		Vector2f getTransform()					const { return transform; }
+		Vector2f getNetForce()					const { return netForce; }
+		Vector2f getGravitationalForce()		const { return gravitationalForce; }
+		Vector2f getBoostForce()				const { return boostForce; }
+		Vector2f getAcceleration()				const { return acceleration; }
+		Vector2f getVelocity()					const { return velocity; }
+		Vector2f getSpeed()						const { return speed; }
+		Vector2f getRequiredVelocity()			const { return reqVelocity; }
+		float getMass()							const { return mass; }
+		float getPeriod()						const { return period; }
+		float getRadius()						const { return radius; }
 #pragma endregion
 
 #pragma region SETTERS
-		void setColliderTransform_X(Vector2f t) { collider.x = t.x; }
-		void setColliderTransform_Y(Vector2f t) { collider.y = t.y; }
-		void setColliderSize(Vector2f s)		{ collider.w = s.x; collider.h = s.y; }
-		void setColliderSize_X(float s)			{ collider.w = s; }
-		void setColliderSize_Y(float s)			{ collider.h = s; }
-		void setRootTransform(Vector2f t)		{ transform = t; }
-		void setRootTransform_X(float t)		{ transform.x += t; }
-		void setRootTransform_Y(float t)		{ transform.y += t; }
-		void setForce(Vector2f f)				{ force = f; }
-		void setForce_X(Vector2f f)				{ force.x = f.x; }
-		void setForce_Y(Vector2f f)				{ force.y = f.y; }
-		void setAcceleration_X(float a)			{ acceleration.x = a; }
-		void setAcceleration_Y(float a)			{ acceleration.y = a; }
-		void setVelocity(Vector2f v)			{ velocity = v; }
-		void setVelocity_X(float v)				{ velocity.x = v; }
-		void setVelocity_Y(float v)				{ velocity.y = v; }
-		void setSpeed(Vector2f s)				{ speed = s; }
-		void setSpeed_X(float s)				{ speed.x = s; }
-		void setSpeed_Y(float s)				{ speed.y = s; }
 		void setMass(float m);
+		void setTag(std::string tag)				{ this->tag = tag; }
+		void setBoostForce_X(float boostForce_X)	{ this->boostForce.x = boostForce_X; }
+		void setBoostForce_Y(float boostForce_Y)	{ this->boostForce.y = boostForce_Y; }
 #pragma endregion
-
-		bool isColliding(const PhysicsObject & other);
-		void moveTo(Vector2f destination);
-		void moveTo(Vector2f destination, Vector2f f);
 };
 
 #endif

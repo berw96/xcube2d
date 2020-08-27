@@ -6,7 +6,6 @@
 class AbstractGame {
 	private:
 		void handleMouseEvents();
-		void updatePhysics();
 
 	protected:
 		AbstractGame();
@@ -29,7 +28,7 @@ class AbstractGame {
 		virtual void onRightMouseButton();
 
 		virtual void update() = 0;
-		virtual void render() = 0;
+		virtual void renderGeometry() = 0;
 
 		virtual void renderUI();
 

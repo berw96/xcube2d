@@ -1,126 +1,83 @@
 #include "PhysicsEngine.h"
 #include <iostream>
 
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(1.f), transform(0.f, 0.f), collider(235.f, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(mass), transform(0.f ,0.f), collider(235.f, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass, Vector2f transform) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(mass), transform(transform), collider(235.f, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, float mass, Vector2f transform, Rectf collider) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(0.01f, 0.01f), mass(mass), transform(transform), collider(collider) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, Vector2f force, float mass, Vector2f transform) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(force), mass(mass), transform(transform), collider(235, 235.f, 30.f, 30.f) {}
-PhysicsObject::PhysicsObject(const Point2& center, float x, float y, Vector2f force, float mass, Vector2f transform, Rectf collider) : center(center), lX(x), lY(y), hlX(x / 2.0f), hlY(y / 2.0f), force(force), mass(mass), transform(transform), collider(collider) {}
-
-bool PhysicsObject::isColliding(const PhysicsObject & other) {
-    Rectf r1 = { center.x - hlX, center.y - hlY, lX, lY };
-    Rectf r2 = { other.center.x - other.hlX, other.center.y - other.hlY, other.lX, other.lY };
-
-	return r1.intersects(r2);
-}
+/*PHYSICS OBJECTS*/
+PhysicsObject::PhysicsObject(const Point2& center) : center(center), mass(_DEFAULT_INIT_MASS_), transform(_DEFAULT_INIT_TRANSFORM_), radius(_DEFAULT_RADIUS_) {}
+PhysicsObject::PhysicsObject(const Point2& center, float mass) : center(center), transform(_DEFAULT_INIT_TRANSFORM_), radius(_DEFAULT_RADIUS_) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float mass, Vector2f transform) : center(center), transform(transform), radius(_DEFAULT_RADIUS_) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float mass, Vector2f transform, float radius) : center(center), transform(transform), radius(radius) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float mass, Vector2f transform, float radius, std::string tag) : center(center), transform(transform), radius(radius), tag(tag) { setMass(mass); }
+PhysicsObject::PhysicsObject(const Point2& center, float mass, Vector2f transform, float radius, std::string tag, Vector2f boostForce) : center(center), transform(transform), radius(radius), tag(tag), boostForce(boostForce) { setMass(mass); }
 
 void PhysicsObject::setMass(float m) {
-
-	/*if the provided mass is negative or zero, set to smallest positive value for a float.*/
 	if (m <= 0.f)
 		m = FLT_MIN;
 	mass = m;
 }
 
-/*
-	Shifts the transform of the PhysicsObject to a given destination.
-	Once it reaches the destination it stops.
-
-	One overload for linear movement, a second for gravitation.
-*/
-void PhysicsObject::moveTo(Vector2f destination) {
-	if (destination.x != getRootTransform().x &&
-		destination.y != getRootTransform().y) {
-		if (destination.x > getRootTransform().x) {
-			//move RIGHT
-			setSpeed_X(1.f);
-		}
-
-		if (destination.x < getRootTransform().x) {
-			//move LEFT
-			setSpeed_X(-1.f);
-		}
-
-		if (destination.y > getRootTransform().y) {
-			//move DOWN
-			setSpeed_Y(1.f);
-		}
-
-		if (destination.y < getRootTransform().y) {
-			//move UP
-			setSpeed_Y(-1.f);
-		}
-	}
-	else {
-		setSpeed(Vector2f(0.f, 0.f));
-	}
-}
-
-void PhysicsObject::moveTo(Vector2f destination, Vector2f f){
-	if (destination.x != getRootTransform().x &&
-		destination.y != getRootTransform().y) {
-		if (destination.x > getRootTransform().x) {
-			//move RIGHT
-			setSpeed_X(getSpeed().x + getAcceleration().x);
-		}
-
-		if (destination.x < getRootTransform().x) {
-			//move LEFT
-			setSpeed_X(getSpeed().x - getAcceleration().x);
-		}
-
-		if (destination.y > getRootTransform().y) {
-			//move DOWN
-			setSpeed_Y(getSpeed().y + getAcceleration().y);
-		}
-
-		if (destination.y < getRootTransform().y) {
-			//move UP
-			setSpeed_Y(getSpeed().y - getAcceleration().y);
-		}
-	}
-	else {
-		setSpeed(Vector2f(0.f, 0.f));
-	}
-}
-
 /* PHYSICS ENGINE */
-
 PhysicsEngine::PhysicsEngine() {}
 
+/*
+	Registers a shared pointer of a PhysicsObject with the PhysicsEngine.
+*/
 void PhysicsEngine::registerObject(std::shared_ptr<PhysicsObject> obj) {
 	objects.push_back(obj);
 }
 
-void PhysicsEngine::update() {
-	/*
-		Called from AbstractGame::updatePhysics(), to invoke refactored physics behaviour.
-	*/
-}
-
+#pragma region MECHANICS
 /*
-	Functions utilize Newton's equation F=ma to determine the appropriate value 
-	of acceleration to be applied to an object given its mass and a value of force.
+	Implements Newton's 2nd Law of Physics which all instances of
+	PhysicsObject registered with the PhysicsEngine will experience.
+
+	Force, acceleration, speed, velocity and mass are all applied to
+	the PhysicsObjects.
 */
-float PhysicsEngine::calculateAcceleration_x(Vector2f F, float m) {
-	float a = F.x / m;
-	return a;
-}
+void PhysicsEngine::mechanics() {
+	for (auto obj: objects) {
+		calculateNetForce(obj);
 
-float PhysicsEngine::calculateAcceleration_y(Vector2f F, float m) {
-	float a = F.y / m;
-	return a;
-}
+		obj->acceleration.x = obj->netForce.x / obj->mass;
+		obj->acceleration.y = obj->netForce.y / obj->mass;
 
-Vector2f PhysicsEngine::calculateMomentum(float m, Vector2f v) {
-	Vector2f mv (m * v.x, m * v.y);
-	return mv;
+		obj->speed.x += obj->acceleration.x;
+		obj->speed.y += obj->acceleration.y;
+
+		obj->velocity.x = obj->speed.x;
+		obj->velocity.y = obj->speed.y;
+
+		obj->transform.x += obj->velocity.x;
+		obj->transform.y += obj->velocity.y;
+
+		obj->center.x = obj->transform.x;
+		obj->center.y = obj->transform.y;
+	}
 }
 
 /*
-	Uses Pythagorean Theorem to calculate the resultant
-	value of a vector's x and y components.
+	Calculates the time which a satellite will take to complete a full orbit
+	of a given target. The result is calculated for the distance at any
+	given time/tick.
+*/
+void PhysicsEngine::calculateOrbitalPeriod(std::shared_ptr<PhysicsObject> satellite, std::shared_ptr<PhysicsObject> target) {
+	satellite->period = sqrtf(2 * PI * pow(calculateRange(satellite,target), 3)/_UNIVERSAL_CONST_GRAVITATION_ * satellite->mass);
+}
+
+/*
+	Calculates the velocity required for a satellite to orbit around a target
+	at a constant distance. The result is calculated for the distance at any
+	given time/tick.
+*/
+void PhysicsEngine::calculateRequiredVelocity(std::shared_ptr<PhysicsObject> satellite, std::shared_ptr<PhysicsObject> target) {
+	float reqVelocity = sqrtf(_UNIVERSAL_CONST_GRAVITATION_ * target->mass / calculateRange(satellite,target));
+
+	satellite->reqVelocity = Vector2f(	(target->transform.x - satellite->transform.x) * reqVelocity,
+										(target->transform.y - satellite->transform.y) * reqVelocity);
+}
+
+/*
+	Calculates the resultant (hypotenuse) of a given vector using
+	Pythagorean Theorem.
 */
 float PhysicsEngine::calculateResultant(Vector2f v) {
 	float res = (sqrtf(pow(v.x, 2) + pow(v.y, 2)));
@@ -128,31 +85,45 @@ float PhysicsEngine::calculateResultant(Vector2f v) {
 }
 
 /*
-	Creates a new Vector2f instance containing the displacement
-	between PhysicsObjects a and b on each axis, assigns the
-	resultant to a float and returns its modulus.
+	Calculates the resultant range between two instance of PhysicsObject.
 */
-float PhysicsEngine::calculateRange(PhysicsObject & a, PhysicsObject & b) {
-	Vector2f AB (
-		a.getRootTransform().x - b.getRootTransform().x,
-		a.getRootTransform().y - b.getRootTransform().y);
+float PhysicsEngine::calculateRange(std::shared_ptr<PhysicsObject> target, std::shared_ptr<PhysicsObject> satellite) {
+	Vector2f range(	target->transform.x - satellite->transform.x, 
+					target->transform.y - satellite->transform.y);
 
-	float range = calculateResultant(AB);
-	/*if the range is negative or zero, set to smallest positive value for a float.*/
-	if (range <= 0.f) {
-		range = FLT_MIN;
-	}
-	return abs(range);
+	float res_range = calculateResultant(range);
+	if (res_range == 0.f)
+		res_range = FLT_MIN;
+
+	return abs((float)res_range);
 }
 
 /*
-	Calculates the product of mass and the set universal constant of
-	gravitation, divides by the range between the two PhysicsObjects
-	(squared) and assigns the result to the return value Vector2f.
+	Calculates the net gravitational force exerted on a given instance
+	of PhysicsObject by all others using Newton's Law of Universal Gravitation.
 */
-Vector2f PhysicsEngine::calculuateGravitationalForce(PhysicsObject & a, PhysicsObject & b){
-	float gForce = (a.getMass() * b.getMass() * _UNIVERSAL_CONST_GRAVITATION_) / pow(calculateRange(a, b), 2);
-	Vector2f gVector(gForce, gForce);
-	
-	return gVector;
+Vector2f PhysicsEngine::calculateNetGravitationalForce(std::shared_ptr<PhysicsObject> satellite) {
+	float gravitationalForce = 0.f;
+	Vector2f satellite_to_target (0.f, 0.f);
+	for (auto t : objects) {
+		if (t != satellite) {
+			//calculates gravity between two instances
+			gravitationalForce = ((t->mass * satellite->mass * _UNIVERSAL_CONST_GRAVITATION_) / pow(calculateRange(t, satellite), 2));
+			//increments the total gravity experienced by the satellite by this value
+			satellite_to_target.x += (t->transform.x - satellite->transform.x) * gravitationalForce;
+			satellite_to_target.y += (t->transform.y - satellite->transform.y) * gravitationalForce;
+		}
+	}
+	return satellite_to_target;
 }
+
+/*
+	Summates all the forces which an instance of PhysicsObject experiences.
+	The net force of an object is considered as the actual force applied to it
+	at all times.
+*/
+void PhysicsEngine::calculateNetForce(std::shared_ptr<PhysicsObject> po) {
+	po->netForce.x = calculateNetGravitationalForce(po).x + po->boostForce.x;
+	po->netForce.y = calculateNetGravitationalForce(po).y + po->boostForce.y;
+}
+#pragma endregion

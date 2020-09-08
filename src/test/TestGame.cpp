@@ -6,11 +6,14 @@ TestGame::TestGame() : AbstractGame(), UI_Toggled(true) {
 	gfx->setVerticalSync(true);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	/*Creates a PO1 PhysicsObject with a mass and init xy-transform*/
 	PO1 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.1f, Vector2f(235.f, 235.f));
 	PO2 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 0.4f, Vector2f(135.f, 135.f), Rectf(135.f, 135.f, 30.f, 30.f));
 	PO3 = new PhysicsObject(Point2(0.f, 0.f), 30.f, 30.f, 200.0f, Vector2f(335.f, 335.f), Rectf(335.f, 335.f, 30.f, 30.f));
 =======
+=======
+>>>>>>> parent of 6d5bfae... 190820-14:56
 	/*Creates PhysicsObjects with mass and init xy-transform*/
 
 	physics->registerObject(PO1);

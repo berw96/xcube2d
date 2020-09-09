@@ -15,7 +15,6 @@ class TestGame : public AbstractGame {
 		void handleMechanics();
 		void update();
 		void renderGeometry();
-		void renderUI();
 	public:
 		TestGame();
 		~TestGame();
